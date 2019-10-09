@@ -1,0 +1,141 @@
+Microsoft Windows [Version 10.0.17134.407]
+(c) 2018 Microsoft Corporation. All rights reserved.
+
+C:\Users\hp>docker exec -it docker_pio_1 /bin/bash
+root@e6ed9ca402ff:/templates# git clone https://github.com/apache/predictionio-template-recommender.git MyRecommendation
+Cloning into 'MyRecommendation'...
+remote: Enumerating objects: 232, done.
+remote: Total 232 (delta 0), reused 0 (delta 0), pack-reused 232
+Receiving objects: 100% (232/232), 40.27 KiB | 59.00 KiB/s, done.
+Resolving deltas: 100% (87/87), done.
+root@e6ed9ca402ff:/templates# cd MyRecommendation/
+root@e6ed9ca402ff:/templates/MyRecommendation# pio status
+[INFO] [Management$] Inspecting PredictionIO...
+[INFO] [Management$] PredictionIO 0.13.0 is installed at /usr/share/predictionio
+[INFO] [Management$] Inspecting Apache Spark...
+[INFO] [Management$] Apache Spark is installed at /usr/share/spark-2.2.2-bin-hadoop2.7
+[INFO] [Management$] Apache Spark 2.2.2 detected (meets minimum requirement of 1.6.3)
+[INFO] [Management$] Inspecting storage backend connections...
+[INFO] [Storage$] Verifying Meta Data Backend (Source: PGSQL)...
+[INFO] [Storage$] Verifying Model Data Backend (Source: PGSQL)...
+[INFO] [Storage$] Verifying Event Data Backend (Source: PGSQL)...
+[INFO] [Storage$] Test writing to Event Store (App Id 0)...
+[INFO] [Management$] Your system is all ready to go.
+root@e6ed9ca402ff:/templates/MyRecommendation# pio app new MyApp1
+[ERROR] [App$] App MyApp1 already exists. Aborting.
+root@e6ed9ca402ff:/templates/MyRecommendation# pio app list
+[INFO] [Pio$]                 Name |   ID |                                                       Access Key | Allowed Event(s)
+[INFO] [Pio$]              IrisApp |    4 |                                                       IRIS_TOKEN | (all)
+[INFO] [Pio$]             MusicApp |    3 | 25I_8Yd81WI5MZYHngyvjXY6_b07MUNSLVIIspP0SK7aC5BTvVxAZ05rqSNVOfLh | (all)
+[INFO] [Pio$]               MyApp1 |    1 | AKIH1Co0GU33AW4tiGMyqgKFlQtGTb5oLxzmpLBMWQTe0sVNmTXnKrnI_-yvUgpt | (all)
+[INFO] [Pio$]            MyTestApp |    2 | 86kQB59o0x-3VUCzEmmRrwl6o0lZse-wdJeU1CoK1c_STnuJs9imkeCjwPw9bD4B | (all)
+[INFO] [Pio$] Finished listing 4 app(s).
+root@e6ed9ca402ff:/templates/MyRecommendation# ACCESS_KEY=AKIH1Co0GU33AW4tiGMyqgKFlQtGTb5oLxzmpLBMWQTe0sVNmTXnKrnI_-yvUgpt
+root@e6ed9ca402ff:/templates/MyRecommendation# curl https://raw.githubusercontent.com/apache/spark/master/data/mllib/sample_movielens_data.txt --create-dirs -o data/sample_movielens_data.txt
+  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+                                 Dload  Upload   Total   Spent    Left  Speed
+100 14351  100 14351    0     0   7650      0  0:00:01  0:00:01 --:--:--  7653
+root@e6ed9ca402ff:/templates/MyRecommendation# pio build
+[INFO] [Engine$] Using command '/usr/share/predictionio/sbt/sbt' at /templates/MyRecommendation to build.
+[INFO] [Engine$] If the path above is incorrect, this process will fail.
+[INFO] [Engine$] Uber JAR disabled. Making sure lib/pio-assembly-0.13.0.jar is absent.
+[INFO] [Engine$] Going to run: /usr/share/predictionio/sbt/sbt  package assemblyPackageDependency in /templates/MyRecommendation
+[INFO] [Engine$] Compilation finished successfully.
+[INFO] [Engine$] Looking for an engine...
+[INFO] [Engine$] Found template-scala-parallel-recommendation-assembly-0.1-SNAPSHOT-deps.jar
+[INFO] [Engine$] Found template-scala-parallel-recommendation_2.11-0.1-SNAPSHOT.jar
+[INFO] [Engine$] Build finished successfully.
+[INFO] [Pio$] Your engine is ready for training.
+root@e6ed9ca402ff:/templates/MyRecommendation# pio train
+[WARN] [WorkflowUtils$] Environment variable MYSQL_JDBC_DRIVER is pointing to a nonexistent file /usr/share/predictionio/lib/mysql-connector-java-8.0.12.jar. Ignoring.
+[INFO] [Runner$] Submission command: /usr/share/spark-2.2.2-bin-hadoop2.7/bin/spark-submit --class org.apache.predictionio.workflow.CreateWorkflow --jars file:/usr/share/predictionio/lib/postgresql-42.2.4.jar,file:/templates/MyRecommendation/target/scala-2.11/template-scala-parallel-recommendation-assembly-0.1-SNAPSHOT-deps.jar,file:/templates/MyRecommendation/target/scala-2.11/template-scala-parallel-recommendation_2.11-0.1-SNAPSHOT.jar,file:/usr/share/predictionio/lib/spark/pio-data-hdfs-assembly-0.13.0.jar,file:/usr/share/predictionio/lib/spark/pio-data-hbase-assembly-0.13.0.jar,file:/usr/share/predictionio/lib/spark/pio-data-jdbc-assembly-0.13.0.jar,file:/usr/share/predictionio/lib/spark/pio-data-localfs-assembly-0.13.0.jar,file:/usr/share/predictionio/lib/spark/pio-data-elasticsearch-assembly-0.13.0.jar,file:/usr/share/predictionio/lib/spark/pio-data-s3-assembly-0.13.0.jar --files file:/etc/predictionio/log4j.properties --driver-class-path /etc/predictionio:/usr/share/predictionio/lib/postgresql-42.2.4.jar:/usr/share/predictionio/lib/mysql-connector-java-8.0.12.jar --driver-java-options -Dpio.log.dir=/var/log/predictionio file:/usr/share/predictionio/lib/pio-assembly-0.13.0.jar --engine-id org.example.recommendation.RecommendationEngine --engine-version a176a5cf6fa6252aa61405b951b1346e6145acfd --engine-variant file:/templates/MyRecommendation/engine.json --verbosity 0 --json-extractor Both --env PIO_ENV_LOADED=1,PIO_STORAGE_REPOSITORIES_METADATA_NAME=pio_meta,PIO_HOME=/usr/share/predictionio,PIO_STORAGE_SOURCES_PGSQL_URL=jdbc:postgresql://postgres/pio,PIO_STORAGE_REPOSITORIES_METADATA_SOURCE=PGSQL,PIO_STORAGE_REPOSITORIES_MODELDATA_SOURCE=PGSQL,PIO_STORAGE_REPOSITORIES_EVENTDATA_NAME=pio_event,PIO_STORAGE_SOURCES_PGSQL_PASSWORD=pio,PIO_STORAGE_SOURCES_PGSQL_TYPE=jdbc,PIO_STORAGE_SOURCES_PGSQL_USERNAME=pio,PIO_STORAGE_REPOSITORIES_MODELDATA_NAME=pio_model,PIO_STORAGE_REPOSITORIES_EVENTDATA_SOURCE=PGSQL,PIO_CONF_DIR=/etc/predictionio
+[INFO] [Engine] Extracting datasource params...
+[INFO] [WorkflowUtils$] No 'name' is found. Default empty String will be used.
+[INFO] [Engine] Datasource params: (,DataSourceParams(INVALID_APP_NAME,None))
+[INFO] [Engine] Extracting preparator params...
+[INFO] [Engine] Preparator params: (,Empty)
+[INFO] [Engine] Extracting serving params...
+[INFO] [Engine] Serving params: (,Empty)
+[INFO] [log] Logging initialized @10047ms
+[INFO] [Server] jetty-9.3.z-SNAPSHOT
+[INFO] [Server] Started @10250ms
+[INFO] [AbstractConnector] Started ServerConnector@23468512{HTTP/1.1,[http/1.1]}{0.0.0.0:4040}
+[INFO] [ContextHandler] Started o.s.j.s.ServletContextHandler@2c719bd4{/jobs,null,AVAILABLE,@Spark}
+[INFO] [ContextHandler] Started o.s.j.s.ServletContextHandler@235c997d{/jobs/json,null,AVAILABLE,@Spark}
+[INFO] [ContextHandler] Started o.s.j.s.ServletContextHandler@4a9a878{/jobs/job,null,AVAILABLE,@Spark}
+[INFO] [ContextHandler] Started o.s.j.s.ServletContextHandler@1c8f6c66{/jobs/job/json,null,AVAILABLE,@Spark}
+[INFO] [ContextHandler] Started o.s.j.s.ServletContextHandler@1b7f06c7{/stages,null,AVAILABLE,@Spark}
+[INFO] [ContextHandler] Started o.s.j.s.ServletContextHandler@729c8063{/stages/json,null,AVAILABLE,@Spark}
+[INFO] [ContextHandler] Started o.s.j.s.ServletContextHandler@23c767e6{/stages/stage,null,AVAILABLE,@Spark}
+[INFO] [ContextHandler] Started o.s.j.s.ServletContextHandler@29079032{/stages/stage/json,null,AVAILABLE,@Spark}
+[INFO] [ContextHandler] Started o.s.j.s.ServletContextHandler@776015fc{/stages/pool,null,AVAILABLE,@Spark}
+[INFO] [ContextHandler] Started o.s.j.s.ServletContextHandler@6ad179b4{/stages/pool/json,null,AVAILABLE,@Spark}
+[INFO] [ContextHandler] Started o.s.j.s.ServletContextHandler@59c500f7{/storage,null,AVAILABLE,@Spark}
+[INFO] [ContextHandler] Started o.s.j.s.ServletContextHandler@50110971{/storage/json,null,AVAILABLE,@Spark}
+[INFO] [ContextHandler] Started o.s.j.s.ServletContextHandler@6661d8c0{/storage/rdd,null,AVAILABLE,@Spark}
+[INFO] [ContextHandler] Started o.s.j.s.ServletContextHandler@6909f6be{/storage/rdd/json,null,AVAILABLE,@Spark}
+[INFO] [ContextHandler] Started o.s.j.s.ServletContextHandler@315c081{/environment,null,AVAILABLE,@Spark}
+[INFO] [ContextHandler] Started o.s.j.s.ServletContextHandler@4db77402{/environment/json,null,AVAILABLE,@Spark}
+[INFO] [ContextHandler] Started o.s.j.s.ServletContextHandler@5ef85555{/executors,null,AVAILABLE,@Spark}
+[INFO] [ContextHandler] Started o.s.j.s.ServletContextHandler@2dafae61{/executors/json,null,AVAILABLE,@Spark}
+[INFO] [ContextHandler] Started o.s.j.s.ServletContextHandler@66e17eff{/executors/threadDump,null,AVAILABLE,@Spark}
+[INFO] [ContextHandler] Started o.s.j.s.ServletContextHandler@1bbddada{/executors/threadDump/json,null,AVAILABLE,@Spark}
+[INFO] [ContextHandler] Started o.s.j.s.ServletContextHandler@721d5b74{/static,null,AVAILABLE,@Spark}
+[INFO] [ContextHandler] Started o.s.j.s.ServletContextHandler@5707f613{/,null,AVAILABLE,@Spark}
+[INFO] [ContextHandler] Started o.s.j.s.ServletContextHandler@6367a688{/api,null,AVAILABLE,@Spark}
+[INFO] [ContextHandler] Started o.s.j.s.ServletContextHandler@7d0100ea{/jobs/job/kill,null,AVAILABLE,@Spark}
+[INFO] [ContextHandler] Started o.s.j.s.ServletContextHandler@4ea17147{/stages/stage/kill,null,AVAILABLE,@Spark}
+[INFO] [ContextHandler] Started o.s.j.s.ServletContextHandler@10f405ff{/metrics/json,null,AVAILABLE,@Spark}
+[INFO] [Engine$] EngineWorkflow.train
+[INFO] [Engine$] DataSource: org.example.recommendation.DataSource@6986f93e
+[INFO] [Engine$] Preparator: org.example.recommendation.Preparator@74b00247
+[INFO] [Engine$] AlgorithmList: List(org.example.recommendation.ALSAlgorithm@4168f3d9)
+[INFO] [Engine$] Data sanity check is on.
+[ERROR] [Common$] Invalid app name INVALID_APP_NAME
+[INFO] [AbstractConnector] Stopped Spark@23468512{HTTP/1.1,[http/1.1]}{0.0.0.0:4040}
+Exception in thread "main" java.lang.IllegalArgumentException: Invalid app name INVALID_APP_NAME
+        at org.apache.predictionio.data.store.Common$$anonfun$appNameToId$1$$anonfun$apply$3.apply(Common.scala:56)
+        at org.apache.predictionio.data.store.Common$$anonfun$appNameToId$1$$anonfun$apply$3.apply(Common.scala:54)
+        at scala.Option.getOrElse(Option.scala:121)
+        at org.apache.predictionio.data.store.Common$$anonfun$appNameToId$1.apply(Common.scala:54)
+        at org.apache.predictionio.data.store.Common$$anonfun$appNameToId$1.apply(Common.scala:36)
+        at scala.collection.mutable.MapLike$class.getOrElseUpdate(MapLike.scala:194)
+        at scala.collection.mutable.AbstractMap.getOrElseUpdate(Map.scala:80)
+        at org.apache.predictionio.data.store.Common$.appNameToId(Common.scala:36)
+        at org.apache.predictionio.data.store.PEventStore$.find(PEventStore.scala:71)
+        at org.example.recommendation.DataSource.getRatings(DataSource.scala:33)
+        at org.example.recommendation.DataSource.readTraining(DataSource.scala:60)
+        at org.example.recommendation.DataSource.readTraining(DataSource.scala:20)
+        at org.apache.predictionio.controller.PDataSource.readTrainingBase(PDataSource.scala:40)
+        at org.apache.predictionio.controller.Engine$.train(Engine.scala:642)
+        at org.apache.predictionio.controller.Engine.train(Engine.scala:176)
+        at org.apache.predictionio.workflow.CoreWorkflow$.runTrain(CoreWorkflow.scala:67)
+        at org.apache.predictionio.workflow.CreateWorkflow$.main(CreateWorkflow.scala:251)
+        at org.apache.predictionio.workflow.CreateWorkflow.main(CreateWorkflow.scala)
+        at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+        at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62)
+        at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+        at java.lang.reflect.Method.invoke(Method.java:498)
+        at org.apache.spark.deploy.SparkSubmit$.org$apache$spark$deploy$SparkSubmit$$runMain(SparkSubmit.scala:775)
+        at org.apache.spark.deploy.SparkSubmit$.doRunMain$1(SparkSubmit.scala:180)
+        at org.apache.spark.deploy.SparkSubmit$.submit(SparkSubmit.scala:205)
+        at org.apache.spark.deploy.SparkSubmit$.main(SparkSubmit.scala:119)
+        at org.apache.spark.deploy.SparkSubmit.main(SparkSubmit.scala)
+root@e6ed9ca402ff:/templates/MyRecommendation# pio build --verbose
+[INFO] [Engine$] Using command '/usr/share/predictionio/sbt/sbt' at /templates/MyRecommendation to build.
+[INFO] [Engine$] If the path above is incorrect, this process will fail.
+[INFO] [Engine$] Uber JAR disabled. Making sure lib/pio-assembly-0.13.0.jar is absent.
+[INFO] [Engine$] Going to run: /usr/share/predictionio/sbt/sbt  package assemblyPackageDependency in /templates/MyRecommendation
+[INFO] [Engine$] [info] Loading project definition from /templates/MyRecommendation/project
+[INFO] [Engine$] [info] Set current project to template-scala-parallel-recommendation (in build file:/templates/MyRecommendation/)
+[INFO] [Engine$] [success] Total time: 1 s, completed Dec 11, 2018 11:19:05 AM
+[INFO] [Engine$] [info] Strategy 'discard' was applied to a file (Run the task at debug level to see details)
+[INFO] [Engine$] [info] Assembly up to date: /templates/MyRecommendation/target/scala-2.11/template-scala-parallel-recommendation-assembly-0.1-SNAPSHOT-deps.jar
+[INFO] [Engine$] [success] Total time: 1 s, completed Dec 11, 2018 11:19:07 AM
+[INFO] [Engine$] Compilation finished successfully.
+[INFO] [Engine$] Looking for an engine...
+[INFO] [Engine$] Found template-scala-parallel-recommendation-assembly-0.1-SNAPSHOT-deps.jar
+[INFO] [Engine$] Found template-scala-parallel-recommendation_2.11-0.1-SNAPSHOT.jar
+[INFO] [Engine$] Build finished successfully.
+[INFO] [Pio$] Your engine is ready for training.
+root@e6ed9ca402ff:/templates/MyRecommendation#
