@@ -1,0 +1,2068 @@
+Microsoft Windows [Version 10.0.17134.472]
+(c) 2018 Microsoft Corporation. All rights reserved.
+
+C:\Users\hp>git clone https://github.com/prbdias/docker-lumen.git
+Cloning into 'docker-lumen'...
+remote: Enumerating objects: 99, done.
+remote: Total 99 (delta 0), reused 0 (delta 0), pack-reused 99
+Unpacking objects: 100% (99/99), done.
+Checking connectivity... done.
+C:\Users\hp>cd docker-lumen
+C:\Users\hp\docker-lumen>copy .env.example .env
+        1 file(s) copied.
+C:\Users\hp\docker-lumen>docker-compose up -d --build
+Creating network "app_default" with the default driver
+Creating volume "app_src" with default driver
+Building application
+Step 1/5 : FROM debian:jessie
+ ---> 39db55273026
+Step 2/5 : MAINTAINER Paulo Dias <prbdias@gmail.com>
+ ---> Using cache
+ ---> 8d97256a345e
+Step 3/5 : WORKDIR /var/www
+ ---> Using cache
+ ---> db8c5d3e6ab8
+Step 4/5 : RUN chown -R www-data /var/www/
+ ---> Using cache
+ ---> 3583ded1c76d
+Step 5/5 : CMD true
+ ---> Using cache
+ ---> b3cabb1f8823
+Successfully built b3cabb1f8823
+Building mysql
+Step 1/4 : FROM mysql:latest
+ ---> f991c20cb508
+Step 2/4 : MAINTAINER Paulo Dias <prbdias@gmail.com>
+ ---> Using cache
+ ---> 74903ce9386c
+Step 3/4 : CMD mysqld
+ ---> Using cache
+ ---> a5e5e05083d9
+Step 4/4 : EXPOSE 3306
+ ---> Using cache
+ ---> 8920868f555b
+Successfully built 8920868f555b
+Building workspace
+Step 1/22 : FROM phusion/baseimage:latest
+ ---> 166cfc3f6974
+Step 2/22 : MAINTAINER Paulo Dias <prbdias@gmail.com>
+ ---> Using cache
+ ---> 9539f981574a
+Step 3/22 : RUN DEBIAN_FRONTEND=noninteractive
+ ---> Using cache
+ ---> 8fcd624d0db1
+Step 4/22 : RUN locale-gen en_US.UTF-8
+ ---> Using cache
+ ---> d8b321072d78
+Step 5/22 : ENV LANGUAGE en_US.UTF-8
+ ---> Using cache
+ ---> f6a607f734f9
+Step 6/22 : ENV LC_ALL en_US.UTF-8
+ ---> Using cache
+ ---> 43b632649258
+Step 7/22 : ENV LC_CTYPE UTF-8
+ ---> Using cache
+ ---> de104e281aed
+Step 8/22 : ENV LANG en_US.UTF-8
+ ---> Using cache
+ ---> 8f08bcfe7118
+Step 9/22 : ENV TERM xterm
+ ---> Using cache
+ ---> 54f03af028ad
+Step 10/22 : RUN apt-get update && apt-get install -y     software-properties-common
+ ---> Using cache
+ ---> 756211138eda
+Step 11/22 : RUN add-apt-repository -y     ppa:ondrej/php
+ ---> Using cache
+ ---> 8c3db6cf5ab1
+Step 12/22 : RUN apt-get update && apt-get install -y --force-yes         php7.1-cli         php7.1-common         php7.1-curl         php7.1-json         php7.1-xml         php7.1-mbstring         php7.1-mcrypt         php7.1-mysql         php7.1-zip         php-memcached         php-xdebug         git         curl         nano         iputils-ping         zip         unzip
+ ---> Using cache
+ ---> 51cdba4949de
+Step 13/22 : RUN apt-get clean
+ ---> Using cache
+ ---> b0cbcc4722a0
+Step 14/22 : RUN echo "alias phpunit='./vendor/bin/phpunit'" >> ~/.bashrc
+ ---> Using cache
+ ---> aa0f638f4af5
+Step 15/22 : RUN curl -s http://getcomposer.org/installer | php     && mv composer.phar /usr/local/bin/     && echo "alias composer='/usr/local/bin/composer.phar'" >> ~/.bashrc
+ ---> Using cache
+ ---> 0a7ba000e231
+Step 16/22 : RUN . ~/.bashrc
+ ---> Using cache
+ ---> 453f75c23bf7
+Step 17/22 : RUN apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+ ---> Using cache
+ ---> d0386bf6dc4e
+Step 18/22 : ENV COMPOSER_ALLOW_SUPERUSER 1
+ ---> Using cache
+ ---> 9519d8b923f0
+Step 19/22 : ADD init.sh /sbin/init.sh
+ ---> Using cache
+ ---> 38972c963557
+Step 20/22 : RUN chmod +x /sbin/init.sh
+ ---> Using cache
+ ---> 8c57ddd78567
+Step 21/22 : CMD /sbin/init.sh
+ ---> Using cache
+ ---> 16c71d3adb10
+Step 22/22 : WORKDIR /var/www
+ ---> Using cache
+ ---> 399cd3eada14
+Successfully built 399cd3eada14
+Building php-fpm
+Step 1/9 : FROM php:7.1-fpm
+ ---> 894f8d826f6a
+Step 2/9 : MAINTAINER Paulo Dias <prbdias@gmail.com>
+ ---> Using cache
+ ---> d21a6028121b
+Step 3/9 : COPY ./php.ini /usr/local/etc/php/
+ ---> Using cache
+ ---> 08c94b4c5849
+Step 4/9 : RUN apt-get update && apt-get install -y     libpq-dev     curl
+ ---> Using cache
+ ---> 524a82acae66
+Step 5/9 : RUN docker-php-ext-install     pdo_mysql     pdo_pgsql
+ ---> Using cache
+ ---> 17d633174919
+Step 6/9 : RUN usermod -u 1000 www-data
+ ---> Using cache
+ ---> 4bd56dce8598
+Step 7/9 : WORKDIR /var/www
+ ---> Using cache
+ ---> 1eeb2cd9ed62
+Step 8/9 : CMD php-fpm
+ ---> Using cache
+ ---> 22b91a2f4b74
+Step 9/9 : EXPOSE 9000
+ ---> Using cache
+ ---> ec5316521083
+Successfully built ec5316521083
+Building nginx
+Step 1/8 : FROM nginx:latest
+ ---> 02256cfb0e4b
+Step 2/8 : MAINTAINER Paulo Dias <prbdias@gmail.com>
+ ---> Using cache
+ ---> e526dc2fba81
+Step 3/8 : ADD nginx.conf /etc/nginx/
+ ---> Using cache
+ ---> 511d22b77382
+Step 4/8 : ADD site.conf /etc/nginx/sites-available/
+ ---> Using cache
+ ---> 2af7786167db
+Step 5/8 : RUN echo "upstream php-upstream { server php-fpm:9000; }" > /etc/nginx/conf.d/upstream.conf
+ ---> Using cache
+ ---> 6c05f9b3760d
+Step 6/8 : RUN usermod -u 1000 www-data
+ ---> Using cache
+ ---> 8e12993152a7
+Step 7/8 : EXPOSE 80 443
+ ---> Using cache
+ ---> fd3d7e5a0908
+Step 8/8 : CMD nginx
+ ---> Using cache
+ ---> aa0d0ac0a930
+Successfully built aa0d0ac0a930
+Creating app_redis_1
+Creating app_application_1
+Creating app_mysql_1
+Creating app_workspace_1
+Creating app_php-fpm_1
+Creating app_nginx_1
+
+ERROR: for nginx  Cannot start service nginx: driver failed programming external connectivity on endpoint app_nginx_1 (8e2be5a91a232e21ab10db8e74336d8b5296303e5dd6311426fd2cf1179937d0): Error starting userland proxy: Bind for 0.0.0.0:80: unexpected error Permission denied
+ERROR: Encountered errors while bringing up the project.
+
+C:\Users\hp\docker-lumen> docker-compose ps
+      Name                     Command                State            Ports
+-----------------------------------------------------------------------------------
+app_application_1   true                             Exit 0
+app_mysql_1         docker-entrypoint.sh mysqld      Up         3306/tcp, 33060/tcp
+app_nginx_1         nginx                            Exit 128
+app_php-fpm_1       docker-php-entrypoint php-fpm    Up         9000/tcp
+app_redis_1         docker-entrypoint.sh redis ...   Up         6379/tcp
+app_workspace_1     /sbin/init.sh                    Exit 127
+
+C:\Users\hp\docker-lumen>docker exec -i -t app_workspace_1 /bin/bash
+Error response from daemon: Container 507b019a88478c3cb64678beab76ba67dfe863df2043594c301e2001e94c5d67 is not running
+
+C:\Users\hp\docker-lumen>docker exec -i -t app_workspace_1 /bin/bash
+Error response from daemon: Container 507b019a88478c3cb64678beab76ba67dfe863df2043594c301e2001e94c5d67 is not running
+
+C:\Users\hp\docker-lumen>php artisan
+'php' is not recognized as an internal or external command,
+operable program or batch file.
+
+C:\Users\hp\docker-lumen>docker exec -it app_workspace_1 /bin/bash
+Error response from daemon: Container 507b019a88478c3cb64678beab76ba67dfe863df2043594c301e2001e94c5d67 is not running
+
+C:\Users\hp\docker-lumen>docker exec -i -t app_workspace_1 /sbin/init.sh
+Error response from daemon: Container 507b019a88478c3cb64678beab76ba67dfe863df2043594c301e2001e94c5d67 is not running
+
+C:\Users\hp\docker-lumen>php artisan
+'php' is not recognized as an internal or external command,
+operable program or batch file.
+
+C:\Users\hp\docker-lumen>php artisan migrate --env=migration
+'php' is not recognized as an internal or external command,
+operable program or batch file.
+
+C:\Users\hp\docker-lumen>docker-compose exec app php artisan key:generate
+ERROR: No such service: app
+
+C:\Users\hp\docker-lumen>docker-compose exec app_workspace_1 php artisan key:generate
+ERROR: No such service: app_workspace_1
+
+C:\Users\hp\docker-lumen>docker-compose exec app php artisan optimize
+ERROR: No such service: app
+
+C:\Users\hp\docker-lumen>phpd artisan migrate --seed
+'phpd' is not recognized as an internal or external command,
+operable program or batch file.
+
+C:\Users\hp\docker-lumen> docker-compose ps
+      Name                     Command                State            Ports
+-----------------------------------------------------------------------------------
+app_application_1   true                             Exit 0
+app_mysql_1         docker-entrypoint.sh mysqld      Up         3306/tcp, 33060/tcp
+app_nginx_1         nginx                            Exit 128
+app_php-fpm_1       docker-php-entrypoint php-fpm    Up         9000/tcp
+app_redis_1         docker-entrypoint.sh redis ...   Up         6379/tcp
+app_workspace_1     /sbin/init.sh                    Exit 127
+
+C:\Users\hp\docker-lumen> docker-compose up -d nginx mysql
+app_mysql_1 is up-to-date
+app_redis_1 is up-to-date
+app_php-fpm_1 is up-to-date
+Starting app_nginx_1
+
+ERROR: for nginx  Cannot start service nginx: driver failed programming external connectivity on endpoint app_nginx_1 (7ea08b98ef293e0dc1aed7162c0e9aca27f0d54477a9aeb34b498dc6ea2821b4): Error starting userland proxy: Bind for 0.0.0.0:80: unexpected error Permission denied
+ERROR: Encountered errors while bringing up the project.
+
+C:\Users\hp\docker-lumen>docker-compose up -d mysql nginx
+app_mysql_1 is up-to-date
+app_redis_1 is up-to-date
+app_php-fpm_1 is up-to-date
+Starting app_nginx_1
+
+ERROR: for nginx  Cannot start service nginx: driver failed programming external connectivity on endpoint app_nginx_1 (c4cac45d29a4fdc8cc440cc77e4cd395ec18f98790267ff7225b1d6bffd85f8d): Error starting userland proxy: Bind for 0.0.0.0:80: unexpected error Permission denied
+ERROR: Encountered errors while bringing up the project.
+
+C:\Users\hp\docker-lumen>docker-compose up -d mysql nginx
+app_mysql_1 is up-to-date
+app_redis_1 is up-to-date
+app_php-fpm_1 is up-to-date
+Recreating app_nginx_1
+
+C:\Users\hp\docker-lumen>docker-compose up -d --build
+Building application
+Step 1/5 : FROM debian:jessie
+ ---> 39db55273026
+Step 2/5 : MAINTAINER Paulo Dias <prbdias@gmail.com>
+ ---> Using cache
+ ---> 8d97256a345e
+Step 3/5 : WORKDIR /var/www
+ ---> Using cache
+ ---> db8c5d3e6ab8
+Step 4/5 : RUN chown -R www-data /var/www/
+ ---> Using cache
+ ---> 3583ded1c76d
+Step 5/5 : CMD true
+ ---> Using cache
+ ---> b3cabb1f8823
+Successfully built b3cabb1f8823
+Building mysql
+Step 1/4 : FROM mysql:latest
+ ---> f991c20cb508
+Step 2/4 : MAINTAINER Paulo Dias <prbdias@gmail.com>
+ ---> Using cache
+ ---> 74903ce9386c
+Step 3/4 : CMD mysqld
+ ---> Using cache
+ ---> a5e5e05083d9
+Step 4/4 : EXPOSE 3306
+ ---> Using cache
+ ---> 8920868f555b
+Successfully built 8920868f555b
+Building workspace
+Step 1/22 : FROM phusion/baseimage:latest
+ ---> 166cfc3f6974
+Step 2/22 : MAINTAINER Paulo Dias <prbdias@gmail.com>
+ ---> Using cache
+ ---> 9539f981574a
+Step 3/22 : RUN DEBIAN_FRONTEND=noninteractive
+ ---> Using cache
+ ---> 8fcd624d0db1
+Step 4/22 : RUN locale-gen en_US.UTF-8
+ ---> Using cache
+ ---> d8b321072d78
+Step 5/22 : ENV LANGUAGE en_US.UTF-8
+ ---> Using cache
+ ---> f6a607f734f9
+Step 6/22 : ENV LC_ALL en_US.UTF-8
+ ---> Using cache
+ ---> 43b632649258
+Step 7/22 : ENV LC_CTYPE UTF-8
+ ---> Using cache
+ ---> de104e281aed
+Step 8/22 : ENV LANG en_US.UTF-8
+ ---> Using cache
+ ---> 8f08bcfe7118
+Step 9/22 : ENV TERM xterm
+ ---> Using cache
+ ---> 54f03af028ad
+Step 10/22 : RUN apt-get update && apt-get install -y     software-properties-common
+ ---> Using cache
+ ---> 756211138eda
+Step 11/22 : RUN add-apt-repository -y     ppa:ondrej/php
+ ---> Using cache
+ ---> 8c3db6cf5ab1
+Step 12/22 : RUN apt-get update && apt-get install -y --force-yes         php7.1-cli         php7.1-common         php7.1-curl         php7.1-json         php7.1-xml         php7.1-mbstring         php7.1-mcrypt         php7.1-mysql         php7.1-zip         php-memcached         php-xdebug         git         curl         nano         iputils-ping         zip         unzip
+ ---> Using cache
+ ---> 51cdba4949de
+Step 13/22 : RUN apt-get clean
+ ---> Using cache
+ ---> b0cbcc4722a0
+Step 14/22 : RUN echo "alias phpunit='./vendor/bin/phpunit'" >> ~/.bashrc
+ ---> Using cache
+ ---> aa0f638f4af5
+Step 15/22 : RUN curl -s http://getcomposer.org/installer | php     && mv composer.phar /usr/local/bin/     && echo "alias composer='/usr/local/bin/composer.phar'" >> ~/.bashrc
+ ---> Using cache
+ ---> 0a7ba000e231
+Step 16/22 : RUN . ~/.bashrc
+ ---> Using cache
+ ---> 453f75c23bf7
+Step 17/22 : RUN apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+ ---> Using cache
+ ---> d0386bf6dc4e
+Step 18/22 : ENV COMPOSER_ALLOW_SUPERUSER 1
+ ---> Using cache
+ ---> 9519d8b923f0
+Step 19/22 : ADD init.sh /sbin/init.sh
+ ---> Using cache
+ ---> 38972c963557
+Step 20/22 : RUN chmod +x /sbin/init.sh
+ ---> Using cache
+ ---> 8c57ddd78567
+Step 21/22 : CMD /sbin/init.sh
+ ---> Using cache
+ ---> 16c71d3adb10
+Step 22/22 : WORKDIR /var/www
+ ---> Using cache
+ ---> 399cd3eada14
+Successfully built 399cd3eada14
+Building php-fpm
+Step 1/9 : FROM php:7.1-fpm
+ ---> 894f8d826f6a
+Step 2/9 : MAINTAINER Paulo Dias <prbdias@gmail.com>
+ ---> Using cache
+ ---> d21a6028121b
+Step 3/9 : COPY ./php.ini /usr/local/etc/php/
+ ---> Using cache
+ ---> 08c94b4c5849
+Step 4/9 : RUN apt-get update && apt-get install -y     libpq-dev     curl
+ ---> Using cache
+ ---> 524a82acae66
+Step 5/9 : RUN docker-php-ext-install     pdo_mysql     pdo_pgsql
+ ---> Using cache
+ ---> 17d633174919
+Step 6/9 : RUN usermod -u 1000 www-data
+ ---> Using cache
+ ---> 4bd56dce8598
+Step 7/9 : WORKDIR /var/www
+ ---> Using cache
+ ---> 1eeb2cd9ed62
+Step 8/9 : CMD php-fpm
+ ---> Using cache
+ ---> 22b91a2f4b74
+Step 9/9 : EXPOSE 9000
+ ---> Using cache
+ ---> ec5316521083
+Successfully built ec5316521083
+Building nginx
+Step 1/8 : FROM nginx:latest
+ ---> 02256cfb0e4b
+Step 2/8 : MAINTAINER Paulo Dias <prbdias@gmail.com>
+ ---> Using cache
+ ---> e526dc2fba81
+Step 3/8 : ADD nginx.conf /etc/nginx/
+ ---> Using cache
+ ---> 511d22b77382
+Step 4/8 : ADD site.conf /etc/nginx/sites-available/
+ ---> Using cache
+ ---> 2af7786167db
+Step 5/8 : RUN echo "upstream php-upstream { server php-fpm:9000; }" > /etc/nginx/conf.d/upstream.conf
+ ---> Using cache
+ ---> 6c05f9b3760d
+Step 6/8 : RUN usermod -u 1000 www-data
+ ---> Using cache
+ ---> 8e12993152a7
+Step 7/8 : EXPOSE 80 443
+ ---> Using cache
+ ---> fd3d7e5a0908
+Step 8/8 : CMD nginx
+ ---> Using cache
+ ---> aa0d0ac0a930
+Successfully built aa0d0ac0a930
+app_redis_1 is up-to-date
+app_mysql_1 is up-to-date
+Starting app_application_1
+app_php-fpm_1 is up-to-date
+Starting app_workspace_1
+app_nginx_1 is up-to-date
+
+C:\Users\hp\docker-lumen> docker-compose ps
+      Name                     Command                State                       Ports
+----------------------------------------------------------------------------------------------------------
+app_application_1   true                             Exit 0
+app_mysql_1         docker-entrypoint.sh mysqld      Up         3306/tcp, 33060/tcp
+app_nginx_1         nginx                            Up         0.0.0.0:443->443/tcp, 0.0.0.0:8080->80/tcp
+app_php-fpm_1       docker-php-entrypoint php-fpm    Up         9000/tcp
+app_redis_1         docker-entrypoint.sh redis ...   Up         6379/tcp
+app_workspace_1     /sbin/init.sh                    Exit 127
+
+C:\Users\hp\docker-lumen>php artisan
+'php' is not recognized as an internal or external command,
+operable program or batch file.
+
+C:\Users\hp\docker-lumen>docker-compose build --no-cache
+Building application
+Step 1/5 : FROM debian:jessie
+ ---> 39db55273026
+Step 2/5 : MAINTAINER Paulo Dias <prbdias@gmail.com>
+ ---> Running in 98c25cf3b37d
+ ---> f65dd38f34ae
+Removing intermediate container 98c25cf3b37d
+Step 3/5 : WORKDIR /var/www
+ ---> 5ee7801be0cf
+Removing intermediate container 36a51864b3a5
+Step 4/5 : RUN chown -R www-data /var/www/
+ ---> Running in 7534dd5f388e
+ ---> 82d7b6912ea7
+Removing intermediate container 7534dd5f388e
+Step 5/5 : CMD true
+ ---> Running in 0359946181f7
+ ---> 6d10530d3728
+Removing intermediate container 0359946181f7
+Successfully built 6d10530d3728
+redis uses an image, skipping
+Building mysql
+Step 1/4 : FROM mysql:latest
+ ---> f991c20cb508
+Step 2/4 : MAINTAINER Paulo Dias <prbdias@gmail.com>
+ ---> Running in 470fb4332f02
+ ---> 2f32235f69df
+Removing intermediate container 470fb4332f02
+Step 3/4 : CMD mysqld
+ ---> Running in 8b125f284ac3
+ ---> 9a96a8235234
+Removing intermediate container 8b125f284ac3
+Step 4/4 : EXPOSE 3306
+ ---> Running in f4f1c3ad35ed
+ ---> 63737c3122d8
+Removing intermediate container f4f1c3ad35ed
+Successfully built 63737c3122d8
+Building workspace
+Step 1/22 : FROM phusion/baseimage:latest
+ ---> 166cfc3f6974
+Step 2/22 : MAINTAINER Paulo Dias <prbdias@gmail.com>
+ ---> Running in 3cbf4be54794
+ ---> 8dd3c75e878c
+Removing intermediate container 3cbf4be54794
+Step 3/22 : RUN DEBIAN_FRONTEND=noninteractive
+ ---> Running in dcc3ba784e86
+ ---> 39b198f74d9b
+Removing intermediate container dcc3ba784e86
+Step 4/22 : RUN locale-gen en_US.UTF-8
+ ---> Running in 6b942334c7a6
+Generating locales (this might take a while)...
+  en_US.UTF-8... done
+Generation complete.
+ ---> 2fff6907310b
+Removing intermediate container 6b942334c7a6
+Step 5/22 : ENV LANGUAGE en_US.UTF-8
+ ---> Running in b4d26fb0c7ab
+ ---> e7fc808d9ac4
+Removing intermediate container b4d26fb0c7ab
+Step 6/22 : ENV LC_ALL en_US.UTF-8
+ ---> Running in 8849a90e2cb0
+ ---> b7c91bc7fc8c
+Removing intermediate container 8849a90e2cb0
+Step 7/22 : ENV LC_CTYPE UTF-8
+ ---> Running in 079a68c6383d
+ ---> a2e86d7d7cf0
+Removing intermediate container 079a68c6383d
+Step 8/22 : ENV LANG en_US.UTF-8
+ ---> Running in 6f6719554311
+ ---> 768b855f8e13
+Removing intermediate container 6f6719554311
+Step 9/22 : ENV TERM xterm
+ ---> Running in f54cabd18a26
+ ---> 7eb17e9a1a0a
+Removing intermediate container f54cabd18a26
+Step 10/22 : RUN apt-get update && apt-get install -y     software-properties-common
+ ---> Running in 1dcd9f9b247d
+Get:1 http://security.ubuntu.com/ubuntu xenial-security InRelease [107 kB]
+Get:2 http://archive.ubuntu.com/ubuntu xenial InRelease [247 kB]
+Get:3 http://security.ubuntu.com/ubuntu xenial-security/main Sources [172 kB]
+Get:4 http://security.ubuntu.com/ubuntu xenial-security/restricted Sources [2,243 B]
+Get:5 http://security.ubuntu.com/ubuntu xenial-security/universe Sources [113 kB]
+Get:6 http://security.ubuntu.com/ubuntu xenial-security/multiverse Sources [2,504 B]
+Get:7 http://security.ubuntu.com/ubuntu xenial-security/main amd64 Packages [762 kB]
+Get:8 http://archive.ubuntu.com/ubuntu xenial-updates InRelease [109 kB]
+Get:9 http://archive.ubuntu.com/ubuntu xenial-backports InRelease [107 kB]
+Get:10 http://archive.ubuntu.com/ubuntu xenial/main Sources [1,103 kB]
+Get:11 http://security.ubuntu.com/ubuntu xenial-security/restricted amd64 Packages [12.7 kB]
+Get:12 http://security.ubuntu.com/ubuntu xenial-security/universe amd64 Packages [522 kB]
+Get:13 http://security.ubuntu.com/ubuntu xenial-security/multiverse amd64 Packages [4,026 B]
+Get:14 http://archive.ubuntu.com/ubuntu xenial/restricted Sources [5,179 B]
+Get:15 http://archive.ubuntu.com/ubuntu xenial/universe Sources [9,802 kB]
+Get:16 http://archive.ubuntu.com/ubuntu xenial/multiverse Sources [215 kB]
+Get:17 http://archive.ubuntu.com/ubuntu xenial/main amd64 Packages [1,558 kB]
+Get:18 http://archive.ubuntu.com/ubuntu xenial/restricted amd64 Packages [14.1 kB]
+Get:19 http://archive.ubuntu.com/ubuntu xenial/universe amd64 Packages [9,827 kB]
+Get:20 http://archive.ubuntu.com/ubuntu xenial/multiverse amd64 Packages [176 kB]
+Get:21 http://archive.ubuntu.com/ubuntu xenial-updates/main Sources [413 kB]
+Get:22 http://archive.ubuntu.com/ubuntu xenial-updates/restricted Sources [2,684 B]
+Get:23 http://archive.ubuntu.com/ubuntu xenial-updates/universe Sources [299 kB]
+Get:24 http://archive.ubuntu.com/ubuntu xenial-updates/multiverse Sources [9,406 B]
+Get:25 http://archive.ubuntu.com/ubuntu xenial-updates/main amd64 Packages [1,163 kB]
+Get:26 http://archive.ubuntu.com/ubuntu xenial-updates/restricted amd64 Packages [13.1 kB]
+Get:27 http://archive.ubuntu.com/ubuntu xenial-updates/universe amd64 Packages [925 kB]
+Get:28 http://archive.ubuntu.com/ubuntu xenial-updates/multiverse amd64 Packages [19.0 kB]
+Get:29 http://archive.ubuntu.com/ubuntu xenial-backports/main Sources [5,073 B]
+Get:30 http://archive.ubuntu.com/ubuntu xenial-backports/universe Sources [7,237 B]
+Get:31 http://archive.ubuntu.com/ubuntu xenial-backports/main amd64 Packages [7,942 B]
+Get:32 http://archive.ubuntu.com/ubuntu xenial-backports/universe amd64 Packages [8,532 B]
+Fetched 27.7 MB in 2min 25s (190 kB/s)
+Reading package lists...
+Reading package lists...
+Building dependency tree...
+Reading state information...
+software-properties-common is already the newest version (0.96.20.7).
+0 upgraded, 0 newly installed, 0 to remove and 54 not upgraded.
+ ---> 6e49cb2a3cc3
+Removing intermediate container 1dcd9f9b247d
+Step 11/22 : RUN add-apt-repository -y     ppa:ondrej/php
+ ---> Running in 2b06abfbb34e
+gpg: keyring `/tmp/tmpssnl9vm9/secring.gpg' created
+gpg: keyring `/tmp/tmpssnl9vm9/pubring.gpg' created
+gpg: requesting key E5267A6C from hkp server keyserver.ubuntu.com
+gpg: /tmp/tmpssnl9vm9/trustdb.gpg: trustdb created
+gpg: key E5267A6C: public key "Launchpad PPA for Ond+Öej Sur++" imported
+gpg: Total number processed: 1
+gpg:               imported: 1  (RSA: 1)
+OK
+ ---> 78fb2bfe6bd6
+Removing intermediate container 2b06abfbb34e
+Step 12/22 : RUN apt-get update && apt-get install -y --force-yes         php7.1-cli         php7.1-common         php7.1-curl         php7.1-json         php7.1-xml         php7.1-mbstring         php7.1-mcrypt         php7.1-mysql         php7.1-zip         php-memcached         php-xdebug         git         curl         nano         iputils-ping         zip         unzip
+ ---> Running in a6c8b7536d2e
+Hit:1 http://archive.ubuntu.com/ubuntu xenial InRelease
+Hit:2 http://security.ubuntu.com/ubuntu xenial-security InRelease
+Get:3 http://ppa.launchpad.net/ondrej/php/ubuntu xenial InRelease [23.9 kB]
+Hit:4 http://archive.ubuntu.com/ubuntu xenial-updates InRelease
+Hit:5 http://archive.ubuntu.com/ubuntu xenial-backports InRelease
+Get:6 http://ppa.launchpad.net/ondrej/php/ubuntu xenial/main amd64 Packages [68.3 kB]
+Fetched 92.2 kB in 2s (40.7 kB/s)
+Reading package lists...
+Reading package lists...
+Building dependency tree...
+Reading state information...
+The following additional packages will be installed:
+  git-man ifupdown iproute2 isc-dhcp-client isc-dhcp-common libatm1 libcurl3
+  libcurl3-gnutls libdns-export162 liberror-perl libgdbm3 libgnutls-openssl27
+  libicu55 libisc-export160 libmagic1 libmcrypt4 libmemcached11 libmnl0
+  libpcre3 libperl5.22 libssl1.1 libxml2 libxslt1.1 libxtables11 libzip5
+  netbase patch perl perl-base perl-modules-5.22 php-common php-igbinary
+  php-msgpack php7.1-opcache php7.1-readline rename rsync sgml-base tzdata ucf
+  xml-core
+Suggested packages:
+  gettext-base git-daemon-run | git-daemon-sysvinit git-doc git-el git-email
+  git-gui gitk gitweb git-arch git-cvs git-mediawiki git-svn ppp rdnssd
+  iproute2-doc resolvconf avahi-autoipd isc-dhcp-client-ddns apparmor file
+  libmcrypt-dev mcrypt spell ed diffutils-doc perl-doc
+  libterm-readline-gnu-perl | libterm-readline-perl-perl make php-pear
+  sgml-base-doc debhelper
+The following NEW packages will be installed:
+  git git-man ifupdown iproute2 iputils-ping isc-dhcp-client isc-dhcp-common
+  libatm1 libcurl3 libdns-export162 liberror-perl libgdbm3 libgnutls-openssl27
+  libicu55 libisc-export160 libmagic1 libmcrypt4 libmemcached11 libmnl0
+  libperl5.22 libssl1.1 libxml2 libxslt1.1 libxtables11 libzip5 nano netbase
+  patch perl perl-modules-5.22 php-common php-igbinary php-memcached
+  php-msgpack php-xdebug php7.1-cli php7.1-common php7.1-curl php7.1-json
+  php7.1-mbstring php7.1-mcrypt php7.1-mysql php7.1-opcache php7.1-readline
+  php7.1-xml php7.1-zip rename rsync sgml-base tzdata ucf unzip xml-core zip
+The following packages will be upgraded:
+  curl libcurl3-gnutls libpcre3 perl-base
+4 upgraded, 54 newly installed, 0 to remove and 51 not upgraded.
+Need to get 30.5 MB of archives.
+After this operation, 140 MB of additional disk space will be used.
+Get:1 http://archive.ubuntu.com/ubuntu xenial-updates/main amd64 perl-base amd64 5.22.1-9ubuntu0.6 [1,283 kB]
+Get:2 http://ppa.launchpad.net/ondrej/php/ubuntu xenial/main amd64 libpcre3 amd64 2:8.41-4+ubuntu16.04.1+deb.sury.org+1 [235 kB]
+Get:3 http://ppa.launchpad.net/ondrej/php/ubuntu xenial/main amd64 libxml2 amd64 2.9.4-1+deb.sury.org~xenial+2 [917 kB]
+Get:4 http://ppa.launchpad.net/ondrej/php/ubuntu xenial/main amd64 libmemcached11 amd64 1.0.18-5+deb.sury.org~xenial+2 [94.9 kB]
+Get:5 http://ppa.launchpad.net/ondrej/php/ubuntu xenial/main amd64 libssl1.1 amd64 1.1.1a-2+ubuntu16.04.1+deb.sury.org+1 [1,510 kB]
+Get:6 http://archive.ubuntu.com/ubuntu xenial/main amd64 libatm1 amd64 1:2.5.1-1.5 [24.2 kB]
+Get:7 http://archive.ubuntu.com/ubuntu xenial/main amd64 libmnl0 amd64 1.0.3-5 [12.0 kB]
+Get:8 http://archive.ubuntu.com/ubuntu xenial/main amd64 libgdbm3 amd64 1.8.3-13.1 [16.9 kB]
+Get:9 http://ppa.launchpad.net/ondrej/php/ubuntu xenial/main amd64 libzip5 amd64 1.3.2-1+ubuntu16.04.1+deb.sury.org+1 [53.1 kB]
+Get:10 http://archive.ubuntu.com/ubuntu xenial/main amd64 sgml-base all 1.26+nmu4ubuntu1 [12.5 kB]
+Get:11 http://ppa.launchpad.net/ondrej/php/ubuntu xenial/main amd64 php-common all 2:69+ubuntu16.04.1+deb.sury.org+1 [15.0 kB]
+Get:12 http://archive.ubuntu.com/ubuntu xenial-updates/main amd64 perl-modules-5.22 all 5.22.1-9ubuntu0.6 [2,629 kB]
+Get:13 http://ppa.launchpad.net/ondrej/php/ubuntu xenial/main amd64 php7.1-common amd64 7.1.25-1+ubuntu16.04.1+deb.sury.org+1 [893 kB]
+Get:14 http://ppa.launchpad.net/ondrej/php/ubuntu xenial/main amd64 php7.1-json amd64 7.1.25-1+ubuntu16.04.1+deb.sury.org+1 [17.2 kB]
+Get:15 http://ppa.launchpad.net/ondrej/php/ubuntu xenial/main amd64 php7.1-opcache amd64 7.1.25-1+ubuntu16.04.1+deb.sury.org+1 [144 kB]
+Get:16 http://ppa.launchpad.net/ondrej/php/ubuntu xenial/main amd64 php7.1-readline amd64 7.1.25-1+ubuntu16.04.1+deb.sury.org+1 [12.9 kB]
+Get:17 http://ppa.launchpad.net/ondrej/php/ubuntu xenial/main amd64 php7.1-cli amd64 7.1.25-1+ubuntu16.04.1+deb.sury.org+1 [1,324 kB]
+Get:18 http://archive.ubuntu.com/ubuntu xenial-updates/main amd64 libperl5.22 amd64 5.22.1-9ubuntu0.6 [3,405 kB]
+Get:19 http://archive.ubuntu.com/ubuntu xenial-updates/main amd64 perl amd64 5.22.1-9ubuntu0.6 [237 kB]
+Get:20 http://archive.ubuntu.com/ubuntu xenial-updates/main amd64 tzdata all 2018g-0ubuntu0.16.04 [166 kB]
+Get:21 http://archive.ubuntu.com/ubuntu xenial-updates/main amd64 iproute2 amd64 4.3.0-1ubuntu3.16.04.4 [521 kB]
+Get:22 http://ppa.launchpad.net/ondrej/php/ubuntu xenial/main amd64 php-igbinary amd64 2.0.7-1+ubuntu16.04.1+deb.sury.org+10 [100 kB]
+Get:23 http://ppa.launchpad.net/ondrej/php/ubuntu xenial/main amd64 php-msgpack amd64 2.0.2+0.5.7-5+ubuntu16.04.1+deb.sury.org+10 [65.7 kB]
+Get:24 http://archive.ubuntu.com/ubuntu xenial-updates/main amd64 ifupdown amd64 0.8.10ubuntu1.4 [54.9 kB]
+Get:25 http://ppa.launchpad.net/ondrej/php/ubuntu xenial/main amd64 php-memcached amd64 3.0.4+2.2.0-3+ubuntu16.04.1+deb.sury.org+10 [84.3 kB]
+Get:26 http://archive.ubuntu.com/ubuntu xenial-updates/main amd64 libgnutls-openssl27 amd64 3.4.10-4ubuntu1.4 [22.0 kB]
+Get:27 http://archive.ubuntu.com/ubuntu xenial/main amd64 iputils-ping amd64 3:20121221-5ubuntu2 [52.7 kB]
+Get:28 http://archive.ubuntu.com/ubuntu xenial-updates/main amd64 libisc-export160 amd64 1:9.10.3.dfsg.P4-8ubuntu1.11 [153 kB]
+Get:29 http://archive.ubuntu.com/ubuntu xenial-updates/main amd64 libdns-export162 amd64 1:9.10.3.dfsg.P4-8ubuntu1.11 [667 kB]
+Get:30 http://ppa.launchpad.net/ondrej/php/ubuntu xenial/main amd64 php-xdebug amd64 2.7.0~beta1+2.6.1+2.5.5-1+ubuntu16.04.1+deb.sury.org+10 [1,141 kB]
+Get:31 http://archive.ubuntu.com/ubuntu xenial-updates/main amd64 isc-dhcp-client amd64 4.3.3-5ubuntu12.10 [224 kB]
+Get:32 http://archive.ubuntu.com/ubuntu xenial-updates/main amd64 isc-dhcp-common amd64 4.3.3-5ubuntu12.10 [105 kB]
+Get:33 http://archive.ubuntu.com/ubuntu xenial-updates/main amd64 libmagic1 amd64 1:5.25-2ubuntu1.1 [216 kB]
+Get:34 http://archive.ubuntu.com/ubuntu xenial/main amd64 libxtables11 amd64 1.6.0-2ubuntu3 [27.2 kB]
+Get:35 http://archive.ubuntu.com/ubuntu xenial/main amd64 netbase all 5.3 [12.9 kB]
+Get:36 http://archive.ubuntu.com/ubuntu xenial/main amd64 ucf all 3.0036 [52.9 kB]
+Get:37 http://archive.ubuntu.com/ubuntu xenial-updates/main amd64 curl amd64 7.47.0-1ubuntu2.11 [139 kB]
+Get:38 http://archive.ubuntu.com/ubuntu xenial-updates/main amd64 libcurl3-gnutls amd64 7.47.0-1ubuntu2.11 [185 kB]
+Get:39 http://ppa.launchpad.net/ondrej/php/ubuntu xenial/main amd64 php7.1-curl amd64 7.1.25-1+ubuntu16.04.1+deb.sury.org+1 [28.2 kB]
+Get:40 http://archive.ubuntu.com/ubuntu xenial-updates/main amd64 libicu55 amd64 55.1-7ubuntu0.4 [7,646 kB]
+Get:41 http://ppa.launchpad.net/ondrej/php/ubuntu xenial/main amd64 php7.1-mbstring amd64 7.1.25-1+ubuntu16.04.1+deb.sury.org+1 [464 kB]
+Get:42 http://ppa.launchpad.net/ondrej/php/ubuntu xenial/main amd64 php7.1-mcrypt amd64 7.1.25-1+ubuntu16.04.1+deb.sury.org+1 [14.6 kB]
+Get:43 http://ppa.launchpad.net/ondrej/php/ubuntu xenial/main amd64 php7.1-mysql amd64 7.1.25-1+ubuntu16.04.1+deb.sury.org+1 [121 kB]
+Get:44 http://ppa.launchpad.net/ondrej/php/ubuntu xenial/main amd64 php7.1-xml amd64 7.1.25-1+ubuntu16.04.1+deb.sury.org+1 [113 kB]
+Get:45 http://ppa.launchpad.net/ondrej/php/ubuntu xenial/main amd64 php7.1-zip amd64 7.1.25-1+ubuntu16.04.1+deb.sury.org+1 [19.8 kB]
+Get:46 http://182.190.4.90:80/data/0404584a4d3e679d/archive.ubuntu.com/ubuntu xenial-updates/main amd64 nano amd64 2.5.3-2ubuntu2 [191 kB]
+Get:47 http://182.190.4.90:80/data/0404c84ab03ffb59/archive.ubuntu.com/ubuntu xenial-updates/main amd64 rsync amd64 3.1.1-3ubuntu1.2 [329 kB]
+Get:48 http://archive.ubuntu.com/ubuntu xenial/main amd64 xml-core all 0.13+nmu2 [23.3 kB]
+Get:49 http://archive.ubuntu.com/ubuntu xenial/main amd64 liberror-perl all 0.17-1.2 [19.6 kB]
+Get:50 http://archive.ubuntu.com/ubuntu xenial-updates/main amd64 git-man all 1:2.7.4-0ubuntu1.6 [736 kB]
+Get:51 http://archive.ubuntu.com/ubuntu xenial-updates/main amd64 git amd64 1:2.7.4-0ubuntu1.6 [3,176 kB]
+Get:52 http://archive.ubuntu.com/ubuntu xenial-updates/main amd64 libcurl3 amd64 7.47.0-1ubuntu2.11 [186 kB]
+Get:53 http://archive.ubuntu.com/ubuntu xenial/universe amd64 libmcrypt4 amd64 2.5.8-3.3 [63.0 kB]
+Get:54 http://archive.ubuntu.com/ubuntu xenial-updates/main amd64 libxslt1.1 amd64 1.1.28-2.1ubuntu0.1 [145 kB]
+Get:55 http://archive.ubuntu.com/ubuntu xenial-updates/main amd64 patch amd64 2.7.5-1ubuntu0.16.04.1 [90.5 kB]
+Get:56 http://archive.ubuntu.com/ubuntu xenial/main amd64 rename all 0.20-4 [12.0 kB]
+Get:57 http://archive.ubuntu.com/ubuntu xenial/main amd64 unzip amd64 6.0-20ubuntu1 [158 kB]
+Get:58 http://archive.ubuntu.com/ubuntu xenial/main amd64 zip amd64 3.0-11 [158 kB]
+dpkg-preconfigure: unable to re-open stdin:
+Fetched 30.5 MB in 1min 52s (270 kB/s)
+(Reading database ... 8750 files and directories currently installed.)
+Preparing to unpack .../perl-base_5.22.1-9ubuntu0.6_amd64.deb ...
+Unpacking perl-base (5.22.1-9ubuntu0.6) over (5.22.1-9ubuntu0.2) ...
+Setting up perl-base (5.22.1-9ubuntu0.6) ...
+Selecting previously unselected package libatm1:amd64.
+(Reading database ... 8750 files and directories currently installed.)
+Preparing to unpack .../libatm1_1%3a2.5.1-1.5_amd64.deb ...
+Unpacking libatm1:amd64 (1:2.5.1-1.5) ...
+Selecting previously unselected package libmnl0:amd64.
+Preparing to unpack .../libmnl0_1.0.3-5_amd64.deb ...
+Unpacking libmnl0:amd64 (1.0.3-5) ...
+Selecting previously unselected package libgdbm3:amd64.
+Preparing to unpack .../libgdbm3_1.8.3-13.1_amd64.deb ...
+Unpacking libgdbm3:amd64 (1.8.3-13.1) ...
+Selecting previously unselected package sgml-base.
+Preparing to unpack .../sgml-base_1.26+nmu4ubuntu1_all.deb ...
+Unpacking sgml-base (1.26+nmu4ubuntu1) ...
+Selecting previously unselected package perl-modules-5.22.
+Preparing to unpack .../perl-modules-5.22_5.22.1-9ubuntu0.6_all.deb ...
+Unpacking perl-modules-5.22 (5.22.1-9ubuntu0.6) ...
+Selecting previously unselected package libperl5.22:amd64.
+Preparing to unpack .../libperl5.22_5.22.1-9ubuntu0.6_amd64.deb ...
+Unpacking libperl5.22:amd64 (5.22.1-9ubuntu0.6) ...
+Selecting previously unselected package perl.
+Preparing to unpack .../perl_5.22.1-9ubuntu0.6_amd64.deb ...
+Unpacking perl (5.22.1-9ubuntu0.6) ...
+Preparing to unpack .../libpcre3_2%3a8.41-4+ubuntu16.04.1+deb.sury.org+1_amd64.deb ...
+Unpacking libpcre3:amd64 (2:8.41-4+ubuntu16.04.1+deb.sury.org+1) over (2:8.38-3.1) ...
+Processing triggers for libc-bin (2.23-0ubuntu10) ...
+Setting up libpcre3:amd64 (2:8.41-4+ubuntu16.04.1+deb.sury.org+1) ...
+Processing triggers for libc-bin (2.23-0ubuntu10) ...
+Selecting previously unselected package tzdata.
+(Reading database ... 10561 files and directories currently installed.)
+Preparing to unpack .../tzdata_2018g-0ubuntu0.16.04_all.deb ...
+Unpacking tzdata (2018g-0ubuntu0.16.04) ...
+Selecting previously unselected package iproute2.
+Preparing to unpack .../iproute2_4.3.0-1ubuntu3.16.04.4_amd64.deb ...
+Unpacking iproute2 (4.3.0-1ubuntu3.16.04.4) ...
+Selecting previously unselected package ifupdown.
+Preparing to unpack .../ifupdown_0.8.10ubuntu1.4_amd64.deb ...
+Unpacking ifupdown (0.8.10ubuntu1.4) ...
+Selecting previously unselected package libgnutls-openssl27:amd64.
+Preparing to unpack .../libgnutls-openssl27_3.4.10-4ubuntu1.4_amd64.deb ...
+Unpacking libgnutls-openssl27:amd64 (3.4.10-4ubuntu1.4) ...
+Selecting previously unselected package iputils-ping.
+Preparing to unpack .../iputils-ping_3%3a20121221-5ubuntu2_amd64.deb ...
+Unpacking iputils-ping (3:20121221-5ubuntu2) ...
+Selecting previously unselected package libisc-export160.
+Preparing to unpack .../libisc-export160_1%3a9.10.3.dfsg.P4-8ubuntu1.11_amd64.deb ...
+Unpacking libisc-export160 (1:9.10.3.dfsg.P4-8ubuntu1.11) ...
+Selecting previously unselected package libdns-export162.
+Preparing to unpack .../libdns-export162_1%3a9.10.3.dfsg.P4-8ubuntu1.11_amd64.deb ...
+Unpacking libdns-export162 (1:9.10.3.dfsg.P4-8ubuntu1.11) ...
+Selecting previously unselected package isc-dhcp-client.
+Preparing to unpack .../isc-dhcp-client_4.3.3-5ubuntu12.10_amd64.deb ...
+Unpacking isc-dhcp-client (4.3.3-5ubuntu12.10) ...
+Selecting previously unselected package isc-dhcp-common.
+Preparing to unpack .../isc-dhcp-common_4.3.3-5ubuntu12.10_amd64.deb ...
+Unpacking isc-dhcp-common (4.3.3-5ubuntu12.10) ...
+Selecting previously unselected package libmagic1:amd64.
+Preparing to unpack .../libmagic1_1%3a5.25-2ubuntu1.1_amd64.deb ...
+Unpacking libmagic1:amd64 (1:5.25-2ubuntu1.1) ...
+Selecting previously unselected package libxtables11:amd64.
+Preparing to unpack .../libxtables11_1.6.0-2ubuntu3_amd64.deb ...
+Unpacking libxtables11:amd64 (1.6.0-2ubuntu3) ...
+Selecting previously unselected package netbase.
+Preparing to unpack .../archives/netbase_5.3_all.deb ...
+Unpacking netbase (5.3) ...
+Selecting previously unselected package ucf.
+Preparing to unpack .../archives/ucf_3.0036_all.deb ...
+Moving old data out of the way
+Unpacking ucf (3.0036) ...
+Preparing to unpack .../curl_7.47.0-1ubuntu2.11_amd64.deb ...
+Unpacking curl (7.47.0-1ubuntu2.11) over (7.47.0-1ubuntu2.5) ...
+Preparing to unpack .../libcurl3-gnutls_7.47.0-1ubuntu2.11_amd64.deb ...
+Unpacking libcurl3-gnutls:amd64 (7.47.0-1ubuntu2.11) over (7.47.0-1ubuntu2.5) ...
+Selecting previously unselected package libicu55:amd64.
+Preparing to unpack .../libicu55_55.1-7ubuntu0.4_amd64.deb ...
+Unpacking libicu55:amd64 (55.1-7ubuntu0.4) ...
+Selecting previously unselected package libxml2:amd64.
+Preparing to unpack .../libxml2_2.9.4-1+deb.sury.org~xenial+2_amd64.deb ...
+Unpacking libxml2:amd64 (2.9.4-1+deb.sury.org~xenial+2) ...
+Selecting previously unselected package nano.
+Preparing to unpack .../nano_2.5.3-2ubuntu2_amd64.deb ...
+Unpacking nano (2.5.3-2ubuntu2) ...
+Selecting previously unselected package rsync.
+Preparing to unpack .../rsync_3.1.1-3ubuntu1.2_amd64.deb ...
+Unpacking rsync (3.1.1-3ubuntu1.2) ...
+Selecting previously unselected package xml-core.
+Preparing to unpack .../xml-core_0.13+nmu2_all.deb ...
+Unpacking xml-core (0.13+nmu2) ...
+Selecting previously unselected package liberror-perl.
+Preparing to unpack .../liberror-perl_0.17-1.2_all.deb ...
+Unpacking liberror-perl (0.17-1.2) ...
+Selecting previously unselected package git-man.
+Preparing to unpack .../git-man_1%3a2.7.4-0ubuntu1.6_all.deb ...
+Unpacking git-man (1:2.7.4-0ubuntu1.6) ...
+Selecting previously unselected package git.
+Preparing to unpack .../git_1%3a2.7.4-0ubuntu1.6_amd64.deb ...
+Unpacking git (1:2.7.4-0ubuntu1.6) ...
+Selecting previously unselected package libcurl3:amd64.
+Preparing to unpack .../libcurl3_7.47.0-1ubuntu2.11_amd64.deb ...
+Unpacking libcurl3:amd64 (7.47.0-1ubuntu2.11) ...
+Selecting previously unselected package libmcrypt4.
+Preparing to unpack .../libmcrypt4_2.5.8-3.3_amd64.deb ...
+Unpacking libmcrypt4 (2.5.8-3.3) ...
+Selecting previously unselected package libmemcached11:amd64.
+Preparing to unpack .../libmemcached11_1.0.18-5+deb.sury.org~xenial+2_amd64.deb ...
+Unpacking libmemcached11:amd64 (1.0.18-5+deb.sury.org~xenial+2) ...
+Selecting previously unselected package libssl1.1:amd64.
+Preparing to unpack .../libssl1.1_1.1.1a-2+ubuntu16.04.1+deb.sury.org+1_amd64.deb ...
+Unpacking libssl1.1:amd64 (1.1.1a-2+ubuntu16.04.1+deb.sury.org+1) ...
+Selecting previously unselected package libxslt1.1:amd64.
+Preparing to unpack .../libxslt1.1_1.1.28-2.1ubuntu0.1_amd64.deb ...
+Unpacking libxslt1.1:amd64 (1.1.28-2.1ubuntu0.1) ...
+Selecting previously unselected package libzip5:amd64.
+Preparing to unpack .../libzip5_1.3.2-1+ubuntu16.04.1+deb.sury.org+1_amd64.deb ...
+Unpacking libzip5:amd64 (1.3.2-1+ubuntu16.04.1+deb.sury.org+1) ...
+Selecting previously unselected package patch.
+Preparing to unpack .../patch_2.7.5-1ubuntu0.16.04.1_amd64.deb ...
+Unpacking patch (2.7.5-1ubuntu0.16.04.1) ...
+Selecting previously unselected package php-common.
+Preparing to unpack .../php-common_2%3a69+ubuntu16.04.1+deb.sury.org+1_all.deb ...
+Unpacking php-common (2:69+ubuntu16.04.1+deb.sury.org+1) ...
+Selecting previously unselected package php7.1-common.
+Preparing to unpack .../php7.1-common_7.1.25-1+ubuntu16.04.1+deb.sury.org+1_amd64.deb ...
+Unpacking php7.1-common (7.1.25-1+ubuntu16.04.1+deb.sury.org+1) ...
+Selecting previously unselected package php7.1-json.
+Preparing to unpack .../php7.1-json_7.1.25-1+ubuntu16.04.1+deb.sury.org+1_amd64.deb ...
+Unpacking php7.1-json (7.1.25-1+ubuntu16.04.1+deb.sury.org+1) ...
+Selecting previously unselected package php7.1-opcache.
+Preparing to unpack .../php7.1-opcache_7.1.25-1+ubuntu16.04.1+deb.sury.org+1_amd64.deb ...
+Unpacking php7.1-opcache (7.1.25-1+ubuntu16.04.1+deb.sury.org+1) ...
+Selecting previously unselected package php7.1-readline.
+Preparing to unpack .../php7.1-readline_7.1.25-1+ubuntu16.04.1+deb.sury.org+1_amd64.deb ...
+Unpacking php7.1-readline (7.1.25-1+ubuntu16.04.1+deb.sury.org+1) ...
+Selecting previously unselected package php7.1-cli.
+Preparing to unpack .../php7.1-cli_7.1.25-1+ubuntu16.04.1+deb.sury.org+1_amd64.deb ...
+Unpacking php7.1-cli (7.1.25-1+ubuntu16.04.1+deb.sury.org+1) ...
+Selecting previously unselected package php-igbinary.
+Preparing to unpack .../php-igbinary_2.0.7-1+ubuntu16.04.1+deb.sury.org+10_amd64.deb ...
+Unpacking php-igbinary (2.0.7-1+ubuntu16.04.1+deb.sury.org+10) ...
+Selecting previously unselected package php-msgpack.
+Preparing to unpack .../php-msgpack_2.0.2+0.5.7-5+ubuntu16.04.1+deb.sury.org+10_amd64.deb ...
+Unpacking php-msgpack (2.0.2+0.5.7-5+ubuntu16.04.1+deb.sury.org+10) ...
+Selecting previously unselected package php-memcached.
+Preparing to unpack .../php-memcached_3.0.4+2.2.0-3+ubuntu16.04.1+deb.sury.org+10_amd64.deb ...
+Unpacking php-memcached (3.0.4+2.2.0-3+ubuntu16.04.1+deb.sury.org+10) ...
+Selecting previously unselected package php-xdebug.
+Preparing to unpack .../php-xdebug_2.7.0~beta1+2.6.1+2.5.5-1+ubuntu16.04.1+deb.sury.org+10_amd64.deb ...
+Unpacking php-xdebug (2.7.0~beta1+2.6.1+2.5.5-1+ubuntu16.04.1+deb.sury.org+10) ...
+Selecting previously unselected package php7.1-curl.
+Preparing to unpack .../php7.1-curl_7.1.25-1+ubuntu16.04.1+deb.sury.org+1_amd64.deb ...
+Unpacking php7.1-curl (7.1.25-1+ubuntu16.04.1+deb.sury.org+1) ...
+Selecting previously unselected package php7.1-mbstring.
+Preparing to unpack .../php7.1-mbstring_7.1.25-1+ubuntu16.04.1+deb.sury.org+1_amd64.deb ...
+Unpacking php7.1-mbstring (7.1.25-1+ubuntu16.04.1+deb.sury.org+1) ...
+Selecting previously unselected package php7.1-mcrypt.
+Preparing to unpack .../php7.1-mcrypt_7.1.25-1+ubuntu16.04.1+deb.sury.org+1_amd64.deb ...
+Unpacking php7.1-mcrypt (7.1.25-1+ubuntu16.04.1+deb.sury.org+1) ...
+Selecting previously unselected package php7.1-mysql.
+Preparing to unpack .../php7.1-mysql_7.1.25-1+ubuntu16.04.1+deb.sury.org+1_amd64.deb ...
+Unpacking php7.1-mysql (7.1.25-1+ubuntu16.04.1+deb.sury.org+1) ...
+Selecting previously unselected package php7.1-xml.
+Preparing to unpack .../php7.1-xml_7.1.25-1+ubuntu16.04.1+deb.sury.org+1_amd64.deb ...
+Unpacking php7.1-xml (7.1.25-1+ubuntu16.04.1+deb.sury.org+1) ...
+Selecting previously unselected package php7.1-zip.
+Preparing to unpack .../php7.1-zip_7.1.25-1+ubuntu16.04.1+deb.sury.org+1_amd64.deb ...
+Unpacking php7.1-zip (7.1.25-1+ubuntu16.04.1+deb.sury.org+1) ...
+Selecting previously unselected package rename.
+Preparing to unpack .../archives/rename_0.20-4_all.deb ...
+Unpacking rename (0.20-4) ...
+Selecting previously unselected package unzip.
+Preparing to unpack .../unzip_6.0-20ubuntu1_amd64.deb ...
+Unpacking unzip (6.0-20ubuntu1) ...
+Selecting previously unselected package zip.
+Preparing to unpack .../archives/zip_3.0-11_amd64.deb ...
+Unpacking zip (3.0-11) ...
+Processing triggers for systemd (229-4ubuntu21) ...
+Processing triggers for libc-bin (2.23-0ubuntu10) ...
+Processing triggers for mime-support (3.59ubuntu1) ...
+Setting up libatm1:amd64 (1:2.5.1-1.5) ...
+Setting up libmnl0:amd64 (1.0.3-5) ...
+Setting up libgdbm3:amd64 (1.8.3-13.1) ...
+Setting up sgml-base (1.26+nmu4ubuntu1) ...
+Setting up perl-modules-5.22 (5.22.1-9ubuntu0.6) ...
+Setting up libperl5.22:amd64 (5.22.1-9ubuntu0.6) ...
+Setting up perl (5.22.1-9ubuntu0.6) ...
+update-alternatives: using /usr/bin/prename to provide /usr/bin/rename (rename) in auto mode
+Setting up tzdata (2018g-0ubuntu0.16.04) ...
+
+Current default time zone: 'Etc/UTC'
+Local time is now:      Mon Dec 31 12:46:06 UTC 2018.
+Universal Time is now:  Mon Dec 31 12:46:06 UTC 2018.
+Run 'dpkg-reconfigure tzdata' if you wish to change it.
+
+Setting up iproute2 (4.3.0-1ubuntu3.16.04.4) ...
+Setting up ifupdown (0.8.10ubuntu1.4) ...
+Creating /etc/network/interfaces.
+Setting up libgnutls-openssl27:amd64 (3.4.10-4ubuntu1.4) ...
+Setting up iputils-ping (3:20121221-5ubuntu2) ...
+Setcap is not installed, falling back to setuid
+Setting up libisc-export160 (1:9.10.3.dfsg.P4-8ubuntu1.11) ...
+Setting up libdns-export162 (1:9.10.3.dfsg.P4-8ubuntu1.11) ...
+Setting up isc-dhcp-client (4.3.3-5ubuntu12.10) ...
+Setting up isc-dhcp-common (4.3.3-5ubuntu12.10) ...
+Setting up libmagic1:amd64 (1:5.25-2ubuntu1.1) ...
+Setting up libxtables11:amd64 (1.6.0-2ubuntu3) ...
+Setting up netbase (5.3) ...
+Setting up ucf (3.0036) ...
+Setting up libcurl3-gnutls:amd64 (7.47.0-1ubuntu2.11) ...
+Setting up curl (7.47.0-1ubuntu2.11) ...
+Setting up libicu55:amd64 (55.1-7ubuntu0.4) ...
+Setting up libxml2:amd64 (2.9.4-1+deb.sury.org~xenial+2) ...
+Setting up nano (2.5.3-2ubuntu2) ...
+update-alternatives: using /bin/nano to provide /usr/bin/editor (editor) in auto mode
+update-alternatives: using /bin/nano to provide /usr/bin/pico (pico) in auto mode
+Setting up rsync (3.1.1-3ubuntu1.2) ...
+invoke-rc.d: could not determine current runlevel
+invoke-rc.d: policy-rc.d denied execution of restart.
+Setting up xml-core (0.13+nmu2) ...
+Setting up liberror-perl (0.17-1.2) ...
+Setting up git-man (1:2.7.4-0ubuntu1.6) ...
+Setting up git (1:2.7.4-0ubuntu1.6) ...
+Setting up libcurl3:amd64 (7.47.0-1ubuntu2.11) ...
+Setting up libmcrypt4 (2.5.8-3.3) ...
+Setting up libmemcached11:amd64 (1.0.18-5+deb.sury.org~xenial+2) ...
+Setting up libssl1.1:amd64 (1.1.1a-2+ubuntu16.04.1+deb.sury.org+1) ...
+Setting up libxslt1.1:amd64 (1.1.28-2.1ubuntu0.1) ...
+Setting up libzip5:amd64 (1.3.2-1+ubuntu16.04.1+deb.sury.org+1) ...
+Setting up patch (2.7.5-1ubuntu0.16.04.1) ...
+Setting up php-common (2:69+ubuntu16.04.1+deb.sury.org+1) ...
+Setting up php7.1-common (7.1.25-1+ubuntu16.04.1+deb.sury.org+1) ...
+
+Creating config file /etc/php/7.1/mods-available/calendar.ini with new version
+
+Creating config file /etc/php/7.1/mods-available/ctype.ini with new version
+
+Creating config file /etc/php/7.1/mods-available/exif.ini with new version
+
+Creating config file /etc/php/7.1/mods-available/fileinfo.ini with new version
+
+Creating config file /etc/php/7.1/mods-available/ftp.ini with new version
+
+Creating config file /etc/php/7.1/mods-available/gettext.ini with new version
+
+Creating config file /etc/php/7.1/mods-available/iconv.ini with new version
+
+Creating config file /etc/php/7.1/mods-available/pdo.ini with new version
+
+Creating config file /etc/php/7.1/mods-available/phar.ini with new version
+
+Creating config file /etc/php/7.1/mods-available/posix.ini with new version
+
+Creating config file /etc/php/7.1/mods-available/shmop.ini with new version
+
+Creating config file /etc/php/7.1/mods-available/sockets.ini with new version
+
+Creating config file /etc/php/7.1/mods-available/sysvmsg.ini with new version
+
+Creating config file /etc/php/7.1/mods-available/sysvsem.ini with new version
+
+Creating config file /etc/php/7.1/mods-available/sysvshm.ini with new version
+
+Creating config file /etc/php/7.1/mods-available/tokenizer.ini with new version
+Setting up php7.1-json (7.1.25-1+ubuntu16.04.1+deb.sury.org+1) ...
+
+Creating config file /etc/php/7.1/mods-available/json.ini with new version
+Setting up php7.1-opcache (7.1.25-1+ubuntu16.04.1+deb.sury.org+1) ...
+
+Creating config file /etc/php/7.1/mods-available/opcache.ini with new version
+Setting up php7.1-readline (7.1.25-1+ubuntu16.04.1+deb.sury.org+1) ...
+
+Creating config file /etc/php/7.1/mods-available/readline.ini with new version
+Setting up php7.1-cli (7.1.25-1+ubuntu16.04.1+deb.sury.org+1) ...
+update-alternatives: using /usr/bin/php7.1 to provide /usr/bin/php (php) in auto mode
+update-alternatives: using /usr/bin/phar7.1 to provide /usr/bin/phar (phar) in auto mode
+update-alternatives: using /usr/bin/phar.phar7.1 to provide /usr/bin/phar.phar (phar.phar) in auto mode
+
+Creating config file /etc/php/7.1/cli/php.ini with new version
+Setting up php-igbinary (2.0.7-1+ubuntu16.04.1+deb.sury.org+10) ...
+Setting up php-msgpack (2.0.2+0.5.7-5+ubuntu16.04.1+deb.sury.org+10) ...
+Setting up php-memcached (3.0.4+2.2.0-3+ubuntu16.04.1+deb.sury.org+10) ...
+Setting up php-xdebug (2.7.0~beta1+2.6.1+2.5.5-1+ubuntu16.04.1+deb.sury.org+10) ...
+Setting up php7.1-curl (7.1.25-1+ubuntu16.04.1+deb.sury.org+1) ...
+
+Creating config file /etc/php/7.1/mods-available/curl.ini with new version
+Setting up php7.1-mbstring (7.1.25-1+ubuntu16.04.1+deb.sury.org+1) ...
+
+Creating config file /etc/php/7.1/mods-available/mbstring.ini with new version
+Setting up php7.1-mcrypt (7.1.25-1+ubuntu16.04.1+deb.sury.org+1) ...
+
+Creating config file /etc/php/7.1/mods-available/mcrypt.ini with new version
+Setting up php7.1-mysql (7.1.25-1+ubuntu16.04.1+deb.sury.org+1) ...
+
+Creating config file /etc/php/7.1/mods-available/mysqlnd.ini with new version
+
+Creating config file /etc/php/7.1/mods-available/mysqli.ini with new version
+
+Creating config file /etc/php/7.1/mods-available/pdo_mysql.ini with new version
+Setting up php7.1-xml (7.1.25-1+ubuntu16.04.1+deb.sury.org+1) ...
+
+Creating config file /etc/php/7.1/mods-available/dom.ini with new version
+
+Creating config file /etc/php/7.1/mods-available/simplexml.ini with new version
+
+Creating config file /etc/php/7.1/mods-available/wddx.ini with new version
+
+Creating config file /etc/php/7.1/mods-available/xml.ini with new version
+
+Creating config file /etc/php/7.1/mods-available/xmlreader.ini with new version
+
+Creating config file /etc/php/7.1/mods-available/xmlwriter.ini with new version
+
+Creating config file /etc/php/7.1/mods-available/xsl.ini with new version
+Setting up php7.1-zip (7.1.25-1+ubuntu16.04.1+deb.sury.org+1) ...
+
+Creating config file /etc/php/7.1/mods-available/zip.ini with new version
+Setting up rename (0.20-4) ...
+update-alternatives: using /usr/bin/file-rename to provide /usr/bin/rename (rename) in auto mode
+Setting up unzip (6.0-20ubuntu1) ...
+Setting up zip (3.0-11) ...
+Processing triggers for libc-bin (2.23-0ubuntu10) ...
+Processing triggers for systemd (229-4ubuntu21) ...
+Processing triggers for sgml-base (1.26+nmu4ubuntu1) ...
+W: --force-yes is deprecated, use one of the options starting with --allow instead.
+ ---> f85f3a4fdaa8
+Removing intermediate container a6c8b7536d2e
+Step 13/22 : RUN apt-get clean
+ ---> Running in 7eb3c536f9e8
+ ---> df0a0eb068d5
+Removing intermediate container 7eb3c536f9e8
+Step 14/22 : RUN echo "alias phpunit='./vendor/bin/phpunit'" >> ~/.bashrc
+ ---> Running in 76be1736226d
+ ---> 59a6bc1a7ea9
+Removing intermediate container 76be1736226d
+Step 15/22 : RUN curl -s http://getcomposer.org/installer | php     && mv composer.phar /usr/local/bin/     && echo "alias composer='/usr/local/bin/composer.phar'" >> ~/.bashrc
+ ---> Running in 4ed928c94863
+All settings correct for using Composer
+Downloading...
+
+Composer (version 1.8.0) successfully installed to: //composer.phar
+Use it: php composer.phar
+
+ ---> 7f168faa83a7
+Removing intermediate container 4ed928c94863
+Step 16/22 : RUN . ~/.bashrc
+ ---> Running in 7ae7bf68d8cf
+/bin/sh: 13: /root/.bashrc: shopt: not found
+/bin/sh: 21: /root/.bashrc: shopt: not found
+ ---> 17901543868c
+Removing intermediate container 7ae7bf68d8cf
+Step 17/22 : RUN apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+ ---> Running in e0946249c733
+ ---> 48c193f47276
+Removing intermediate container e0946249c733
+Step 18/22 : ENV COMPOSER_ALLOW_SUPERUSER 1
+ ---> Running in d7c8f1a510fc
+ ---> 0948a3962291
+Removing intermediate container d7c8f1a510fc
+Step 19/22 : ADD init.sh /sbin/init.sh
+ ---> a75076a91b0a
+Removing intermediate container aaa59752c785
+Step 20/22 : RUN chmod +x /sbin/init.sh
+ ---> Running in fe2878c6cc73
+ ---> 77bf5c24063b
+Removing intermediate container fe2878c6cc73
+Step 21/22 : CMD /sbin/init.sh
+ ---> Running in 9d5bc8a935a9
+ ---> 336d820a22cc
+Removing intermediate container 9d5bc8a935a9
+Step 22/22 : WORKDIR /var/www
+ ---> 1d1aef8eac99
+Removing intermediate container 7d7612fbcbeb
+Successfully built 1d1aef8eac99
+Building php-fpm
+Step 1/9 : FROM php:7.1-fpm
+ ---> 894f8d826f6a
+Step 2/9 : MAINTAINER Paulo Dias <prbdias@gmail.com>
+ ---> Running in e4b35e2bdf62
+ ---> 6ac983274ce9
+Removing intermediate container e4b35e2bdf62
+Step 3/9 : COPY ./php.ini /usr/local/etc/php/
+ ---> 0ac7e42078b0
+Removing intermediate container eae12745e4c7
+Step 4/9 : RUN apt-get update && apt-get install -y     libpq-dev     curl
+ ---> Running in b50141be8967
+Ign:1 http://cdn-fastly.deb.debian.org/debian stretch InRelease
+Get:2 http://security-cdn.debian.org/debian-security stretch/updates InRelease [94.3 kB]
+Get:3 http://cdn-fastly.deb.debian.org/debian stretch-updates InRelease [91.0 kB]
+Get:4 http://cdn-fastly.deb.debian.org/debian stretch Release [118 kB]
+Get:5 http://security-cdn.debian.org/debian-security stretch/updates/main amd64 Packages [464 kB]
+Get:6 http://cdn-fastly.deb.debian.org/debian stretch-updates/main amd64 Packages [5152 B]
+Get:7 http://cdn-fastly.deb.debian.org/debian stretch Release.gpg [2434 B]
+Get:8 http://cdn-fastly.deb.debian.org/debian stretch/main amd64 Packages [7089 kB]
+Fetched 7864 kB in 30s (261 kB/s)
+Reading package lists...
+Reading package lists...
+Building dependency tree...
+Reading state information...
+curl is already the newest version (7.52.1-5+deb9u8).
+Suggested packages:
+  postgresql-doc-9.6
+The following NEW packages will be installed:
+  libpq-dev libpq5
+0 upgraded, 2 newly installed, 0 to remove and 6 not upgraded.
+Need to get 350 kB of archives.
+After this operation, 1634 kB of additional disk space will be used.
+Get:1 http://cdn-fastly.deb.debian.org/debian stretch/main amd64 libpq5 amd64 9.6.10-0+deb9u1 [136 kB]
+Get:2 http://cdn-fastly.deb.debian.org/debian stretch/main amd64 libpq-dev amd64 9.6.10-0+deb9u1 [215 kB]
+debconf: delaying package configuration, since apt-utils is not installed
+Fetched 350 kB in 1s (271 kB/s)
+Selecting previously unselected package libpq5:amd64.
+(Reading database ... 12242 files and directories currently installed.)
+Preparing to unpack .../libpq5_9.6.10-0+deb9u1_amd64.deb ...
+Unpacking libpq5:amd64 (9.6.10-0+deb9u1) ...
+Selecting previously unselected package libpq-dev.
+Preparing to unpack .../libpq-dev_9.6.10-0+deb9u1_amd64.deb ...
+Unpacking libpq-dev (9.6.10-0+deb9u1) ...
+Setting up libpq5:amd64 (9.6.10-0+deb9u1) ...
+Processing triggers for libc-bin (2.24-11+deb9u3) ...
+Setting up libpq-dev (9.6.10-0+deb9u1) ...
+ ---> 1acc6a635a20
+Removing intermediate container b50141be8967
+Step 5/9 : RUN docker-php-ext-install     pdo_mysql     pdo_pgsql
+ ---> Running in 6a82dd820694
+Configuring for:
+PHP Api Version:         20160303
+Zend Module Api No:      20160303
+Zend Extension Api No:   320160303
+checking for grep that handles long lines and -e... /bin/grep
+checking for egrep... /bin/grep -E
+checking for a sed that does not truncate output... /bin/sed
+checking for cc... cc
+checking whether the C compiler works... yes
+checking for C compiler default output file name... a.out
+checking for suffix of executables...
+checking whether we are cross compiling... no
+checking for suffix of object files... o
+checking whether we are using the GNU C compiler... yes
+checking whether cc accepts -g... yes
+checking for cc option to accept ISO C89... none needed
+checking how to run the C preprocessor... cc -E
+checking for icc... no
+checking for suncc... no
+checking whether cc understands -c and -o together... yes
+checking for system library directory... lib
+checking if compiler supports -R... no
+checking if compiler supports -Wl,-rpath,... yes
+checking build system type... x86_64-pc-linux-gnu
+checking host system type... x86_64-pc-linux-gnu
+checking target system type... x86_64-pc-linux-gnu
+checking for PHP prefix... /usr/local
+checking for PHP includes... -I/usr/local/include/php -I/usr/local/include/php/main -I/usr/local/include/php/TSRM -I/usr/local/include/php/Zend -I/usr/local/include/php/ext -I/usr/local/include/php/ext/date/lib
+checking for PHP extension directory... /usr/local/lib/php/extensions/no-debug-non-zts-20160303
+checking for PHP installed headers prefix... /usr/local/include/php
+checking if debug is enabled... no
+checking if zts is enabled... no
+checking for re2c... re2c
+checking for re2c version... 0.16 (ok)
+checking for gawk... no
+checking for nawk... nawk
+checking if nawk is broken... no
+checking for MySQL support for PDO... yes, shared
+checking for the location of libz... no
+checking for MySQL UNIX socket location...
+checking for PDO includes... checking for PDO includes... /usr/local/include/php/ext
+checking for ld used by cc... /usr/bin/ld
+checking if the linker (/usr/bin/ld) is GNU ld... yes
+checking for /usr/bin/ld option to reload object files... -r
+checking for BSD-compatible nm... /usr/bin/nm -B
+checking whether ln -s works... yes
+checking how to recognize dependent libraries... pass_all
+checking for ANSI C header files... yes
+checking for sys/types.h... yes
+checking for sys/stat.h... yes
+checking for stdlib.h... yes
+checking for string.h... yes
+checking for memory.h... yes
+checking for strings.h... yes
+checking for inttypes.h... yes
+checking for stdint.h... yes
+checking for unistd.h... yes
+checking dlfcn.h usability... yes
+checking dlfcn.h presence... yes
+checking for dlfcn.h... yes
+checking the maximum length of command line arguments... 1572864
+checking command to parse /usr/bin/nm -B output from cc object... ok
+checking for objdir... .libs
+checking for ar... ar
+checking for ranlib... ranlib
+checking for strip... strip
+checking if cc supports -fno-rtti -fno-exceptions... no
+checking for cc option to produce PIC... -fPIC
+checking if cc PIC flag -fPIC works... yes
+checking if cc static flag -static works... yes
+checking if cc supports -c -o file.o... yes
+checking whether the cc linker (/usr/bin/ld -m elf_x86_64) supports shared libraries... yes
+checking whether -lc should be explicitly linked in... no
+checking dynamic linker characteristics... GNU/Linux ld.so
+checking how to hardcode library paths into programs... immediate
+checking whether stripping libraries is possible... yes
+checking if libtool supports shared libraries... yes
+checking whether to build shared libraries... yes
+checking whether to build static libraries... no
+
+creating libtool
+appending configuration tag "CXX" to libtool
+configure: creating ./config.status
+config.status: creating config.h
+/bin/bash /usr/src/php/ext/pdo_mysql/libtool --mode=compile cc -I/usr/local/include/php/ext -I -DZEND_ENABLE_STATIC_TSRMLS_CACHE=1 -I. -I/usr/src/php/ext/pdo_mysql -DPHP_ATOM_INC -I/usr/src/php/ext/pdo_mysql/include -I/usr/src/php/ext/pdo_mysql/main -I/usr/src/php/ext/pdo_mysql -I/usr/local/include/php -I/usr/local/include/php/main -I/usr/local/include/php/TSRM -I/usr/local/include/php/Zend -I/usr/local/include/php/ext -I/usr/local/include/php/ext/date/lib  -fstack-protector-strong -fpic -fpie -O2 -DHAVE_CONFIG_H  -fstack-protector-strong -fpic -fpie -O2   -c /usr/src/php/ext/pdo_mysql/pdo_mysql.c -o pdo_mysql.lo
+mkdir .libs
+ cc -I/usr/local/include/php/ext -I -DZEND_ENABLE_STATIC_TSRMLS_CACHE=1 -I. -I/usr/src/php/ext/pdo_mysql -DPHP_ATOM_INC -I/usr/src/php/ext/pdo_mysql/include -I/usr/src/php/ext/pdo_mysql/main -I/usr/src/php/ext/pdo_mysql -I/usr/local/include/php -I/usr/local/include/php/main -I/usr/local/include/php/TSRM -I/usr/local/include/php/Zend -I/usr/local/include/php/ext -I/usr/local/include/php/ext/date/lib -fstack-protector-strong -fpic -fpie -O2 -DHAVE_CONFIG_H -fstack-protector-strong -fpic -fpie -O2 -c /usr/src/php/ext/pdo_mysql/pdo_mysql.c  -fPIC -DPIC -o .libs/pdo_mysql.o
+/bin/bash /usr/src/php/ext/pdo_mysql/libtool --mode=compile cc -I/usr/local/include/php/ext -I -DZEND_ENABLE_STATIC_TSRMLS_CACHE=1 -I. -I/usr/src/php/ext/pdo_mysql -DPHP_ATOM_INC -I/usr/src/php/ext/pdo_mysql/include -I/usr/src/php/ext/pdo_mysql/main -I/usr/src/php/ext/pdo_mysql -I/usr/local/include/php -I/usr/local/include/php/main -I/usr/local/include/php/TSRM -I/usr/local/include/php/Zend -I/usr/local/include/php/ext -I/usr/local/include/php/ext/date/lib  -fstack-protector-strong -fpic -fpie -O2 -DHAVE_CONFIG_H  -fstack-protector-strong -fpic -fpie -O2   -c /usr/src/php/ext/pdo_mysql/mysql_driver.c -o mysql_driver.lo
+ cc -I/usr/local/include/php/ext -I -DZEND_ENABLE_STATIC_TSRMLS_CACHE=1 -I. -I/usr/src/php/ext/pdo_mysql -DPHP_ATOM_INC -I/usr/src/php/ext/pdo_mysql/include -I/usr/src/php/ext/pdo_mysql/main -I/usr/src/php/ext/pdo_mysql -I/usr/local/include/php -I/usr/local/include/php/main -I/usr/local/include/php/TSRM -I/usr/local/include/php/Zend -I/usr/local/include/php/ext -I/usr/local/include/php/ext/date/lib -fstack-protector-strong -fpic -fpie -O2 -DHAVE_CONFIG_H -fstack-protector-strong -fpic -fpie -O2 -c /usr/src/php/ext/pdo_mysql/mysql_driver.c  -fPIC -DPIC -o .libs/mysql_driver.o
+/bin/bash /usr/src/php/ext/pdo_mysql/libtool --mode=compile cc -I/usr/local/include/php/ext -I -DZEND_ENABLE_STATIC_TSRMLS_CACHE=1 -I. -I/usr/src/php/ext/pdo_mysql -DPHP_ATOM_INC -I/usr/src/php/ext/pdo_mysql/include -I/usr/src/php/ext/pdo_mysql/main -I/usr/src/php/ext/pdo_mysql -I/usr/local/include/php -I/usr/local/include/php/main -I/usr/local/include/php/TSRM -I/usr/local/include/php/Zend -I/usr/local/include/php/ext -I/usr/local/include/php/ext/date/lib  -fstack-protector-strong -fpic -fpie -O2 -DHAVE_CONFIG_H  -fstack-protector-strong -fpic -fpie -O2   -c /usr/src/php/ext/pdo_mysql/mysql_statement.c -o mysql_statement.lo
+ cc -I/usr/local/include/php/ext -I -DZEND_ENABLE_STATIC_TSRMLS_CACHE=1 -I. -I/usr/src/php/ext/pdo_mysql -DPHP_ATOM_INC -I/usr/src/php/ext/pdo_mysql/include -I/usr/src/php/ext/pdo_mysql/main -I/usr/src/php/ext/pdo_mysql -I/usr/local/include/php -I/usr/local/include/php/main -I/usr/local/include/php/TSRM -I/usr/local/include/php/Zend -I/usr/local/include/php/ext -I/usr/local/include/php/ext/date/lib -fstack-protector-strong -fpic -fpie -O2 -DHAVE_CONFIG_H -fstack-protector-strong -fpic -fpie -O2 -c /usr/src/php/ext/pdo_mysql/mysql_statement.c  -fPIC -DPIC -o .libs/mysql_statement.o
+/bin/bash /usr/src/php/ext/pdo_mysql/libtool --mode=link cc -DPHP_ATOM_INC -I/usr/src/php/ext/pdo_mysql/include -I/usr/src/php/ext/pdo_mysql/main -I/usr/src/php/ext/pdo_mysql -I/usr/local/include/php -I/usr/local/include/php/main -I/usr/local/include/php/TSRM -I/usr/local/include/php/Zend -I/usr/local/include/php/ext -I/usr/local/include/php/ext/date/lib  -fstack-protector-strong -fpic -fpie -O2 -DHAVE_CONFIG_H  -fstack-protector-strong -fpic -fpie -O2  -Wl,-O1 -Wl,--hash-style=both -pie -o pdo_mysql.la -export-dynamic -avoid-version -prefer-pic -module -rpath /usr/src/php/ext/pdo_mysql/modules  pdo_mysql.lo mysql_driver.lo mysql_statement.lo
+cc -shared  .libs/pdo_mysql.o .libs/mysql_driver.o .libs/mysql_statement.o   -Wl,-O1 -Wl,--hash-style=both -Wl,-soname -Wl,pdo_mysql.so -o .libs/pdo_mysql.so
+creating pdo_mysql.la
+(cd .libs && rm -f pdo_mysql.la && ln -s ../pdo_mysql.la pdo_mysql.la)
+/bin/bash /usr/src/php/ext/pdo_mysql/libtool --mode=install cp ./pdo_mysql.la /usr/src/php/ext/pdo_mysql/modules
+cp ./.libs/pdo_mysql.so /usr/src/php/ext/pdo_mysql/modules/pdo_mysql.so
+cp ./.libs/pdo_mysql.lai /usr/src/php/ext/pdo_mysql/modules/pdo_mysql.la
+PATH="$PATH:/sbin" ldconfig -n /usr/src/php/ext/pdo_mysql/modules
+----------------------------------------------------------------------
+Libraries have been installed in:
+   /usr/src/php/ext/pdo_mysql/modules
+
+If you ever happen to want to link against installed libraries
+in a given directory, LIBDIR, you must either use libtool, and
+specify the full pathname of the library, or use the `-LLIBDIR'
+flag during linking and do at least one of the following:
+   - add LIBDIR to the `LD_LIBRARY_PATH' environment variable
+     during execution
+   - add LIBDIR to the `LD_RUN_PATH' environment variable
+     during linking
+   - use the `-Wl,--rpath -Wl,LIBDIR' linker flag
+   - have your system administrator add LIBDIR to `/etc/ld.so.conf'
+
+See any operating system documentation about shared libraries for
+more information, such as the ld(1) and ld.so(8) manual pages.
+----------------------------------------------------------------------
+
+Build complete.
+Don't forget to run 'make test'.
+
+Installing shared extensions:     /usr/local/lib/php/extensions/no-debug-non-zts-20160303/
+find . -name \*.gcno -o -name \*.gcda | xargs rm -f
+find . -name \*.lo -o -name \*.o | xargs rm -f
+find . -name \*.la -o -name \*.a | xargs rm -f
+find . -name \*.so | xargs rm -f
+find . -name .libs -a -type d|xargs rm -rf
+rm -f libphp.la       modules/* libs/*
+Configuring for:
+PHP Api Version:         20160303
+Zend Module Api No:      20160303
+Zend Extension Api No:   320160303
+checking for grep that handles long lines and -e... /bin/grep
+checking for egrep... /bin/grep -E
+checking for a sed that does not truncate output... /bin/sed
+checking for cc... cc
+checking whether the C compiler works... yes
+checking for C compiler default output file name... a.out
+checking for suffix of executables...
+checking whether we are cross compiling... no
+checking for suffix of object files... o
+checking whether we are using the GNU C compiler... yes
+checking whether cc accepts -g... yes
+checking for cc option to accept ISO C89... none needed
+checking how to run the C preprocessor... cc -E
+checking for icc... no
+checking for suncc... no
+checking whether cc understands -c and -o together... yes
+checking for system library directory... lib
+checking if compiler supports -R... no
+checking if compiler supports -Wl,-rpath,... yes
+checking build system type... x86_64-pc-linux-gnu
+checking host system type... x86_64-pc-linux-gnu
+checking target system type... x86_64-pc-linux-gnu
+checking for PHP prefix... /usr/local
+checking for PHP includes... -I/usr/local/include/php -I/usr/local/include/php/main -I/usr/local/include/php/TSRM -I/usr/local/include/php/Zend -I/usr/local/include/php/ext -I/usr/local/include/php/ext/date/lib
+checking for PHP extension directory... /usr/local/lib/php/extensions/no-debug-non-zts-20160303
+checking for PHP installed headers prefix... /usr/local/include/php
+checking if debug is enabled... no
+checking if zts is enabled... no
+checking for re2c... re2c
+checking for re2c version... 0.16 (ok)
+checking for gawk... no
+checking for nawk... nawk
+checking if nawk is broken... no
+checking for PostgreSQL support for PDO... yes, shared
+checking for pg_config... /usr/bin/pg_config
+checking for openssl dependencies... no
+checking for PQprepare in -lpq... yes
+checking for PQexecParams in -lpq... yes
+checking for PQescapeStringConn in -lpq... yes
+checking for PQescapeByteaConn in -lpq... yes
+checking for PDO includes... checking for PDO includes... /usr/local/include/php/ext
+checking for ld used by cc... /usr/bin/ld
+checking if the linker (/usr/bin/ld) is GNU ld... yes
+checking for /usr/bin/ld option to reload object files... -r
+checking for BSD-compatible nm... /usr/bin/nm -B
+checking whether ln -s works... yes
+checking how to recognize dependent libraries... pass_all
+checking for ANSI C header files... yes
+checking for sys/types.h... yes
+checking for sys/stat.h... yes
+checking for stdlib.h... yes
+checking for string.h... yes
+checking for memory.h... yes
+checking for strings.h... yes
+checking for inttypes.h... yes
+checking for stdint.h... yes
+checking for unistd.h... yes
+checking dlfcn.h usability... yes
+checking dlfcn.h presence... yes
+checking for dlfcn.h... yes
+checking the maximum length of command line arguments... 1572864
+checking command to parse /usr/bin/nm -B output from cc object... ok
+checking for objdir... .libs
+checking for ar... ar
+checking for ranlib... ranlib
+checking for strip... strip
+checking if cc supports -fno-rtti -fno-exceptions... no
+checking for cc option to produce PIC... -fPIC
+checking if cc PIC flag -fPIC works... yes
+checking if cc static flag -static works... yes
+checking if cc supports -c -o file.o... yes
+checking whether the cc linker (/usr/bin/ld -m elf_x86_64) supports shared libraries... yes
+checking whether -lc should be explicitly linked in... no
+checking dynamic linker characteristics... GNU/Linux ld.so
+checking how to hardcode library paths into programs... immediate
+checking whether stripping libraries is possible... yes
+checking if libtool supports shared libraries... yes
+checking whether to build shared libraries... yes
+checking whether to build static libraries... no
+
+creating libtool
+appending configuration tag "CXX" to libtool
+configure: creating ./config.status
+config.status: creating config.h
+/bin/bash /usr/src/php/ext/pdo_pgsql/libtool --mode=compile cc -I/usr/local/include/php/ext  -I. -I/usr/src/php/ext/pdo_pgsql -DPHP_ATOM_INC -I/usr/src/php/ext/pdo_pgsql/include -I/usr/src/php/ext/pdo_pgsql/main -I/usr/src/php/ext/pdo_pgsql -I/usr/local/include/php -I/usr/local/include/php/main -I/usr/local/include/php/TSRM -I/usr/local/include/php/Zend -I/usr/local/include/php/ext -I/usr/local/include/php/ext/date/lib -I/usr/include/postgresql  -fstack-protector-strong -fpic -fpie -O2 -DHAVE_CONFIG_H  -fstack-protector-strong -fpic -fpie -O2   -c /usr/src/php/ext/pdo_pgsql/pdo_pgsql.c -o pdo_pgsql.lo
+mkdir .libs
+ cc -I/usr/local/include/php/ext -I. -I/usr/src/php/ext/pdo_pgsql -DPHP_ATOM_INC -I/usr/src/php/ext/pdo_pgsql/include -I/usr/src/php/ext/pdo_pgsql/main -I/usr/src/php/ext/pdo_pgsql -I/usr/local/include/php -I/usr/local/include/php/main -I/usr/local/include/php/TSRM -I/usr/local/include/php/Zend -I/usr/local/include/php/ext -I/usr/local/include/php/ext/date/lib -I/usr/include/postgresql -fstack-protector-strong -fpic -fpie -O2 -DHAVE_CONFIG_H -fstack-protector-strong -fpic -fpie -O2 -c /usr/src/php/ext/pdo_pgsql/pdo_pgsql.c  -fPIC -DPIC -o .libs/pdo_pgsql.o
+/bin/bash /usr/src/php/ext/pdo_pgsql/libtool --mode=compile cc -I/usr/local/include/php/ext  -I. -I/usr/src/php/ext/pdo_pgsql -DPHP_ATOM_INC -I/usr/src/php/ext/pdo_pgsql/include -I/usr/src/php/ext/pdo_pgsql/main -I/usr/src/php/ext/pdo_pgsql -I/usr/local/include/php -I/usr/local/include/php/main -I/usr/local/include/php/TSRM -I/usr/local/include/php/Zend -I/usr/local/include/php/ext -I/usr/local/include/php/ext/date/lib -I/usr/include/postgresql  -fstack-protector-strong -fpic -fpie -O2 -DHAVE_CONFIG_H  -fstack-protector-strong -fpic -fpie -O2   -c /usr/src/php/ext/pdo_pgsql/pgsql_driver.c -o pgsql_driver.lo
+ cc -I/usr/local/include/php/ext -I. -I/usr/src/php/ext/pdo_pgsql -DPHP_ATOM_INC -I/usr/src/php/ext/pdo_pgsql/include -I/usr/src/php/ext/pdo_pgsql/main -I/usr/src/php/ext/pdo_pgsql -I/usr/local/include/php -I/usr/local/include/php/main -I/usr/local/include/php/TSRM -I/usr/local/include/php/Zend -I/usr/local/include/php/ext -I/usr/local/include/php/ext/date/lib -I/usr/include/postgresql -fstack-protector-strong -fpic -fpie -O2 -DHAVE_CONFIG_H -fstack-protector-strong -fpic -fpie -O2 -c /usr/src/php/ext/pdo_pgsql/pgsql_driver.c  -fPIC -DPIC -o .libs/pgsql_driver.o
+/bin/bash /usr/src/php/ext/pdo_pgsql/libtool --mode=compile cc -I/usr/local/include/php/ext  -I. -I/usr/src/php/ext/pdo_pgsql -DPHP_ATOM_INC -I/usr/src/php/ext/pdo_pgsql/include -I/usr/src/php/ext/pdo_pgsql/main -I/usr/src/php/ext/pdo_pgsql -I/usr/local/include/php -I/usr/local/include/php/main -I/usr/local/include/php/TSRM -I/usr/local/include/php/Zend -I/usr/local/include/php/ext -I/usr/local/include/php/ext/date/lib -I/usr/include/postgresql  -fstack-protector-strong -fpic -fpie -O2 -DHAVE_CONFIG_H  -fstack-protector-strong -fpic -fpie -O2   -c /usr/src/php/ext/pdo_pgsql/pgsql_statement.c -o pgsql_statement.lo
+ cc -I/usr/local/include/php/ext -I. -I/usr/src/php/ext/pdo_pgsql -DPHP_ATOM_INC -I/usr/src/php/ext/pdo_pgsql/include -I/usr/src/php/ext/pdo_pgsql/main -I/usr/src/php/ext/pdo_pgsql -I/usr/local/include/php -I/usr/local/include/php/main -I/usr/local/include/php/TSRM -I/usr/local/include/php/Zend -I/usr/local/include/php/ext -I/usr/local/include/php/ext/date/lib -I/usr/include/postgresql -fstack-protector-strong -fpic -fpie -O2 -DHAVE_CONFIG_H -fstack-protector-strong -fpic -fpie -O2 -c /usr/src/php/ext/pdo_pgsql/pgsql_statement.c  -fPIC -DPIC -o .libs/pgsql_statement.o
+/bin/bash /usr/src/php/ext/pdo_pgsql/libtool --mode=link cc -DPHP_ATOM_INC -I/usr/src/php/ext/pdo_pgsql/include -I/usr/src/php/ext/pdo_pgsql/main -I/usr/src/php/ext/pdo_pgsql -I/usr/local/include/php -I/usr/local/include/php/main -I/usr/local/include/php/TSRM -I/usr/local/include/php/Zend -I/usr/local/include/php/ext -I/usr/local/include/php/ext/date/lib -I/usr/include/postgresql  -fstack-protector-strong -fpic -fpie -O2 -DHAVE_CONFIG_H  -fstack-protector-strong -fpic -fpie -O2  -Wl,-O1 -Wl,--hash-style=both -pie -o pdo_pgsql.la -export-dynamic -avoid-version -prefer-pic -module -rpath /usr/src/php/ext/pdo_pgsql/modules  pdo_pgsql.lo pgsql_driver.lo pgsql_statement.lo -Wl,-rpath,/usr/lib/x86_64-linux-gnu -L/usr/lib/x86_64-linux-gnu -lpq
+cc -shared  .libs/pdo_pgsql.o .libs/pgsql_driver.o .libs/pgsql_statement.o  -L/usr/lib/x86_64-linux-gnu -lpq  -Wl,-O1 -Wl,--hash-style=both -Wl,-rpath -Wl,/usr/lib/x86_64-linux-gnu -Wl,-soname -Wl,pdo_pgsql.so -o .libs/pdo_pgsql.so
+creating pdo_pgsql.la
+(cd .libs && rm -f pdo_pgsql.la && ln -s ../pdo_pgsql.la pdo_pgsql.la)
+/bin/bash /usr/src/php/ext/pdo_pgsql/libtool --mode=install cp ./pdo_pgsql.la /usr/src/php/ext/pdo_pgsql/modules
+cp ./.libs/pdo_pgsql.so /usr/src/php/ext/pdo_pgsql/modules/pdo_pgsql.so
+cp ./.libs/pdo_pgsql.lai /usr/src/php/ext/pdo_pgsql/modules/pdo_pgsql.la
+PATH="$PATH:/sbin" ldconfig -n /usr/src/php/ext/pdo_pgsql/modules
+----------------------------------------------------------------------
+Libraries have been installed in:
+   /usr/src/php/ext/pdo_pgsql/modules
+
+If you ever happen to want to link against installed libraries
+in a given directory, LIBDIR, you must either use libtool, and
+specify the full pathname of the library, or use the `-LLIBDIR'
+flag during linking and do at least one of the following:
+   - add LIBDIR to the `LD_LIBRARY_PATH' environment variable
+     during execution
+   - add LIBDIR to the `LD_RUN_PATH' environment variable
+     during linking
+   - use the `-Wl,--rpath -Wl,LIBDIR' linker flag
+   - have your system administrator add LIBDIR to `/etc/ld.so.conf'
+
+See any operating system documentation about shared libraries for
+more information, such as the ld(1) and ld.so(8) manual pages.
+----------------------------------------------------------------------
+
+Build complete.
+Don't forget to run 'make test'.
+
+Installing shared extensions:     /usr/local/lib/php/extensions/no-debug-non-zts-20160303/
+find . -name \*.gcno -o -name \*.gcda | xargs rm -f
+find . -name \*.lo -o -name \*.o | xargs rm -f
+find . -name \*.la -o -name \*.a | xargs rm -f
+find . -name \*.so | xargs rm -f
+find . -name .libs -a -type d|xargs rm -rf
+rm -f libphp.la       modules/* libs/*
+ ---> 4bea266899d8
+Removing intermediate container 6a82dd820694
+Step 6/9 : RUN usermod -u 1000 www-data
+ ---> Running in 672c929d688b
+ ---> 75c5f36df97a
+Removing intermediate container 672c929d688b
+Step 7/9 : WORKDIR /var/www
+ ---> 465413da5c9a
+Removing intermediate container c3df5aaadaef
+Step 8/9 : CMD php-fpm
+ ---> Running in 7954fb7cc30e
+ ---> 1124c07c34eb
+Removing intermediate container 7954fb7cc30e
+Step 9/9 : EXPOSE 9000
+ ---> Running in d9128d592fe5
+ ---> 869bf83d614a
+Removing intermediate container d9128d592fe5
+Successfully built 869bf83d614a
+Building nginx
+Step 1/8 : FROM nginx:latest
+ ---> 02256cfb0e4b
+Step 2/8 : MAINTAINER Paulo Dias <prbdias@gmail.com>
+ ---> Running in 0f1a20ea710e
+ ---> af101d198e95
+Removing intermediate container 0f1a20ea710e
+Step 3/8 : ADD nginx.conf /etc/nginx/
+ ---> 1eca46f0f452
+Removing intermediate container f60c5397e15f
+Step 4/8 : ADD site.conf /etc/nginx/sites-available/
+ ---> ae3c92641d04
+Removing intermediate container 8a5750153348
+Step 5/8 : RUN echo "upstream php-upstream { server php-fpm:9000; }" > /etc/nginx/conf.d/upstream.conf
+ ---> Running in 5c2bba7798fc
+ ---> d4ca1fab4e28
+Removing intermediate container 5c2bba7798fc
+Step 6/8 : RUN usermod -u 1000 www-data
+ ---> Running in 15a4360663a9
+ ---> e75b025a68a1
+Removing intermediate container 15a4360663a9
+Step 7/8 : EXPOSE 80 443
+ ---> Running in bf1826ec0807
+ ---> b53c17cef605
+Removing intermediate container bf1826ec0807
+Step 8/8 : CMD nginx
+ ---> Running in d7ea8077fa60
+ ---> 0ae3a33461f0
+Removing intermediate container d7ea8077fa60
+Successfully built 0ae3a33461f0
+
+C:\Users\hp\docker-lumen>docker-compose build --no-cache
+C:\Users\hp>cd C:\Users\hp\docker-lumen\src
+
+
+
+
+Microsoft Windows [Version 10.0.17134.472]
+(c) 2018 Microsoft Corporation. All rights reserved.
+
+C:\Users\hp>docker info
+Containers: 33
+ Running: 7
+ Paused: 0
+ Stopped: 26
+Images: 186
+Server Version: 17.03.1-ce-rc1
+Storage Driver: overlay2
+ Backing Filesystem: extfs
+ Supports d_type: true
+ Native Overlay Diff: true
+Logging Driver: json-file
+Cgroup Driver: cgroupfs
+Plugins:
+ Volume: local
+ Network: bridge host ipvlan macvlan null overlay
+Swarm: inactive
+Runtimes: runc
+Default Runtime: runc
+Init Binary: docker-init
+containerd version: 4ab9917febca54791c5f071a9d1f404867857fcc
+runc version: 54296cf40ad8143b62dbcaa1d90e520a2136ddfe
+init version: N/A (expected: 949e6facb77383876aeff8a6944dde66b3089574)
+Security Options:
+ seccomp
+  Profile: default
+Kernel Version: 4.9.13-moby
+Operating System: Alpine Linux v3.5
+OSType: linux
+Architecture: x86_64
+CPUs: 2
+Total Memory: 1.934 GiB
+Name: moby
+ID: OZ3J:QWN2:R37W:UDTN:WXSL:HXOI:LQGZ:OBU6:QDMP:3F3M:U5PD:UVEJ
+Docker Root Dir: /var/lib/docker
+Debug Mode (client): false
+Debug Mode (server): true
+ File Descriptors: 90
+ Goroutines: 80
+ System Time: 2019-01-04T09:32:13.7235619Z
+ EventsListeners: 0
+Registry: https://index.docker.io/v1/
+Experimental: true
+Insecure Registries:
+ 127.0.0.0/8
+Live Restore Enabled: false
+
+C:\Users\hp>
+C:\Users\hp>docker exec -it docker_pio_1 /bin/bash
+root@e6ed9ca402ff:/templates# cd
+root@e6ed9ca402ff:~# cd /
+root@e6ed9ca402ff:/# cd var/
+root@e6ed9ca402ff:/var# notepad /var/lib/docker/containers/224d1ec2cc7a1a2e65bee7e0c55c097e1faf16aab831455e9726ab2d83b89472/224d1ec2cc7a1a2e65bee7e0c55c097e1faf16aab831455e9726ab2d83b89472-json.log\
+> ^C
+root@e6ed9ca402ff:/var# notepad /var/lib/docker/containers/224d1ec2cc7a1a2e65bee7e0c55c097e1faf16aab831455e9726ab2d83b89472/224d1ec2cc7a1a2e65bee7e0c55c097e1faf16aab831455e9726ab2d83b89472-json.log
+bash: notepad: command not found
+root@e6ed9ca402ff:/var# cd /
+root@e6ed9ca402ff:/# notepad /var/lib/docker/containers/224d1ec2cc7a1a2e65bee7e0c55c097e1faf16aab831455e9726ab2d83b89472/224d1ec2cc7a1a2e65bee7e0c55c097e1faf16aab831455e9726ab2d83b89472-json.log
+bash: notepad: command not found
+root@e6ed9ca402ff:/# vi /var/lib/docker/containers/224d1ec2cc7a1a2e65bee7e0c55c097e1faf16aab831455e9726ab2d83b89472/224d
+1ec2cc7a1a2e65bee7e0c55c097e1faf16aab831455e9726ab2d83b89472-json.log
+bash: vi: command not found
+root@e6ed9ca402ff:/# vi /var/lib/docker/containers/224d1ec2cc7a1a2e65bee7e0c55c097e1faf16aab831455e9726ab2d83b89472/224d1ec2cc7a1a2e65bee7e0c55c097e1faf16aab831455e9726ab2d83b89472-json.log
+bash: vi: command not found
+root@e6ed9ca402ff:/# vi /var/lib/docker/containers/224d1ec2cc7a1a2e65bee7e0c55c097e1faf16aab831455e9726ab2d83b89472/224d
+1ec2cc7a1a2e65bee7e0c55c097e1faf16aab831455e9726ab2d83b89472-json.log
+bash: vi: command not found
+root@e6ed9ca402ff:/# vim /var/lib/docker/containers/224d1ec2cc7a1a2e65bee7e0c55c097e1faf16aab831455e9726ab2d83b89472/224
+d1ec2cc7a1a2e65bee7e0c55c097e1faf16aab831455e9726ab2d83b89472-json.log
+bash: vim: command not found
+root@e6ed9ca402ff:/# notepad /var/lib/docker/containers/224d1ec2cc7a1a2e65bee7e0c55c097e1faf16aab831455e9726ab2d83b89472/224d1ec2cc7a1a2e65bee7e0c55c097e1faf16aab831455e9726ab2d83b89472-json.log
+bash: notepad: command not found
+root@e6ed9ca402ff:/# RUN apt-get update && apt-get -y install python python-dev  python-pip
+bash: RUN: command not found
+root@e6ed9ca402ff:/# ls -l
+total 72
+drwxr-xr-x   1 root root 4096 Dec 12 11:33 bin
+drwxr-xr-x   2 root root 4096 Oct 20 10:40 boot
+drwxr-x---   2 root root 4096 Dec 26 08:14 data
+drwxr-xr-x   5 root root  340 Dec 31 11:12 dev
+lrwxrwxrwx   1 root root   33 Nov 16 14:57 docker-java-home -> /usr/lib/jvm/java-8-openjdk-amd64
+drwxr-xr-x   1 root root 4096 Dec 12 11:34 etc
+drwxr-xr-x   2 root root 4096 Oct 20 10:40 home
+drwxr-xr-x   1 root root 4096 Dec 12 11:32 lib
+drwxr-xr-x   2 root root 4096 Nov 12 00:00 lib64
+drwxr-xr-x   2 root root 4096 Nov 12 00:00 media
+drwxr-xr-x   2 root root 4096 Nov 12 00:00 mnt
+drwxr-xr-x   1 root root 4096 Nov 18 23:52 opt
+drwxr-xr-x   3 root root 4096 Dec 12 06:09 path
+dr-xr-xr-x 171 root root    0 Dec 31 11:12 proc
+drwx------   1 root root 4096 Dec 26 10:46 root
+drwxr-xr-x   1 root root 4096 Dec 12 11:33 run
+drwxr-xr-x   1 root root 4096 Dec 12 11:32 sbin
+drwxr-xr-x   2 root root 4096 Nov 12 00:00 srv
+dr-xr-xr-x  13 root root    0 Dec 31 11:12 sys
+drwxr-xr-x   3 root root   60 Jan  2 07:27 templates
+drwxrwxrwt   1 root root 4096 Jan  4 08:25 tmp
+drwxr-xr-x   1 root root 4096 Nov 12 00:00 usr
+drwxr-xr-x   1 root root 4096 Nov 12 00:00 var
+root@e6ed9ca402ff:/# docker-compose up
+bash: docker-compose: command not found
+root@e6ed9ca402ff:/#
+
+
+
+Microsoft Windows [Version 10.0.17134.472]
+(c) 2018 Microsoft Corporation. All rights reserved.
+
+C:\Users\hp>cd C:\Users\hp\docker-lumen
+
+C:\Users\hp\docker-lumen>docker-compose up -d --build
+Building application
+Step 1/5 : FROM debian:jessie
+ ---> 39db55273026
+Step 2/5 : MAINTAINER Paulo Dias <prbdias@gmail.com>
+ ---> Using cache
+ ---> b1e2dbae7d8b
+Step 3/5 : WORKDIR /var/www
+ ---> Using cache
+ ---> dcc48ad60d92
+Step 4/5 : RUN chown -R www-data /var/www/
+ ---> Using cache
+ ---> d27036d3b7ff
+Step 5/5 : CMD true
+ ---> Using cache
+ ---> 2830d5555729
+Successfully built 2830d5555729
+Building mysql
+Step 1/4 : FROM mysql:latest
+ ---> f991c20cb508
+Step 2/4 : MAINTAINER Paulo Dias <prbdias@gmail.com>
+ ---> Using cache
+ ---> 94e1e5a89c71
+Step 3/4 : CMD mysqld
+ ---> Using cache
+ ---> 450fda4bfe9f
+Step 4/4 : EXPOSE 3306
+ ---> Using cache
+ ---> f6ecc0f15e93
+Successfully built f6ecc0f15e93
+Building workspace
+Step 1/22 : FROM phusion/baseimage:latest
+ ---> 166cfc3f6974
+Step 2/22 : MAINTAINER Paulo Dias <prbdias@gmail.com>
+ ---> Using cache
+ ---> c6852278e897
+Step 3/22 : RUN DEBIAN_FRONTEND=noninteractive
+ ---> Using cache
+ ---> 443a47443a65
+Step 4/22 : RUN locale-gen en_US.UTF-8
+ ---> Using cache
+ ---> c143d3f61aa2
+Step 5/22 : ENV LANGUAGE en_US.UTF-8
+ ---> Using cache
+ ---> 4a920357c5b7
+Step 6/22 : ENV LC_ALL en_US.UTF-8
+ ---> Using cache
+ ---> 890914dcf259
+Step 7/22 : ENV LC_CTYPE UTF-8
+ ---> Using cache
+ ---> c2324cff2979
+Step 8/22 : ENV LANG en_US.UTF-8
+ ---> Using cache
+ ---> d9fc6b652e18
+Step 9/22 : ENV TERM xterm
+ ---> Using cache
+ ---> f1a1f43f0579
+Step 10/22 : RUN apt-get update && apt-get install -y     software-properties-common
+ ---> Using cache
+ ---> 2bd92eef190c
+Step 11/22 : RUN add-apt-repository -y     ppa:ondrej/php
+ ---> Using cache
+ ---> 98026577cab6
+Step 12/22 : RUN apt-get update && apt-get install -y --force-yes         php7.1-cli         php7.1-common         php7.1-curl         php7.1-json         php7.1-xml         php7.1-mbstring         php7.1-mcrypt         php7.1-mysql         php7.1-zip         php-memcached         php-xdebug         git         curl         nano         iputils-ping         zip         unzip
+ ---> Using cache
+ ---> 9d1341b01436
+Step 13/22 : RUN apt-get clean
+ ---> Using cache
+ ---> f90a49f42703
+Step 14/22 : RUN echo "alias phpunit='./vendor/bin/phpunit'" >> ~/.bashrc
+ ---> Using cache
+ ---> a0b56b5c6e92
+Step 15/22 : RUN curl -s http://getcomposer.org/installer | php     && mv composer.phar /usr/local/bin/     && echo "alias composer='/usr/local/bin/composer.phar'" >> ~/.bashrc
+ ---> Using cache
+ ---> 343f16bebf61
+Step 16/22 : RUN . ~/.bashrc
+ ---> Using cache
+ ---> 20f10f7d77e7
+Step 17/22 : RUN apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+ ---> Using cache
+ ---> e641c652ff34
+Step 18/22 : ENV COMPOSER_ALLOW_SUPERUSER 1
+ ---> Using cache
+ ---> e7179b350e5c
+Step 19/22 : ADD init.sh /sbin/init.sh
+ ---> Using cache
+ ---> 39b5ead75923
+Step 20/22 : RUN chmod +x /sbin/init.sh
+ ---> Using cache
+ ---> 8592d1fb6a79
+Step 21/22 : CMD /sbin/init.sh
+ ---> Using cache
+ ---> 9e081847117c
+Step 22/22 : WORKDIR /var/www
+ ---> Using cache
+ ---> 1542fe455e42
+Successfully built 1542fe455e42
+Building php-fpm
+Step 1/9 : FROM php:7.1-fpm
+ ---> 894f8d826f6a
+Step 2/9 : MAINTAINER Paulo Dias <prbdias@gmail.com>
+ ---> Using cache
+ ---> 45b10d772b28
+Step 3/9 : COPY ./php.ini /usr/local/etc/php/
+ ---> Using cache
+ ---> cb0cf63a7b2f
+Step 4/9 : RUN apt-get update && apt-get install -y     libpq-dev     curl
+ ---> Using cache
+ ---> 79195d5a68b9
+Step 5/9 : RUN docker-php-ext-install     pdo_mysql     pdo_pgsql
+ ---> Using cache
+ ---> aa80206a2a93
+Step 6/9 : RUN usermod -u 1000 www-data
+ ---> Using cache
+ ---> 26b264ff283e
+Step 7/9 : WORKDIR /var/www
+ ---> Using cache
+ ---> 128363250c9d
+Step 8/9 : CMD php-fpm
+ ---> Using cache
+ ---> f30beaee5f1d
+Step 9/9 : EXPOSE 9000
+ ---> Using cache
+ ---> 678f9b9b7797
+Successfully built 678f9b9b7797
+Building nginx
+Step 1/8 : FROM nginx:latest
+ ---> 02256cfb0e4b
+Step 2/8 : MAINTAINER Paulo Dias <prbdias@gmail.com>
+ ---> Using cache
+ ---> 0451f2762e45
+Step 3/8 : ADD nginx.conf /etc/nginx/
+ ---> Using cache
+ ---> 8b704ae5d16d
+Step 4/8 : ADD site.conf /etc/nginx/sites-available/
+ ---> Using cache
+ ---> 3e5e579d6589
+Step 5/8 : RUN echo "upstream php-upstream { server php-fpm:9000; }" > /etc/nginx/conf.d/upstream.conf
+ ---> Using cache
+ ---> 2eb3570d5706
+Step 6/8 : RUN usermod -u 1000 www-data
+ ---> Using cache
+ ---> 4f8afbae6f64
+Step 7/8 : EXPOSE 80 443
+ ---> Using cache
+ ---> b48c1d1ed6cd
+Step 8/8 : CMD nginx
+ ---> Using cache
+ ---> 7ed2edb6fbdc
+Successfully built 7ed2edb6fbdc
+app_redis_1 is up-to-date
+app_mysql_1 is up-to-date
+Starting app_application_1
+app_php-fpm_1 is up-to-date
+Starting app_workspace_1
+app_nginx_1 is up-to-date
+
+C:\Users\hp\docker-lumen>docker-compose ps
+      Name                     Command                State                       Ports
+----------------------------------------------------------------------------------------------------------
+app_application_1   true                             Exit 0
+app_mysql_1         docker-entrypoint.sh mysqld      Up         3306/tcp, 33060/tcp
+app_nginx_1         nginx                            Up         0.0.0.0:443->443/tcp, 0.0.0.0:8080->80/tcp
+app_php-fpm_1       docker-php-entrypoint php-fpm    Up         9000/tcp
+app_redis_1         docker-entrypoint.sh redis ...   Up         6379/tcp
+app_workspace_1     /sbin/init.sh                    Exit 127
+
+C:\Users\hp\docker-lumen>docker ps
+CONTAINER ID        IMAGE                     COMMAND                  CREATED             STATUS              PORTS                                            NAMES
+585c14dc1321        app_nginx                 "nginx"                  45 hours ago        Up 45 hours         0.0.0.0:443->443/tcp, 0.0.0.0:8080->80/tcp       app_nginx_1
+221dcfcd86f6        app_php-fpm               "docker-php-entryp..."   45 hours ago        Up 45 hours         9000/tcp                                         app_php-fpm_1
+5b11a29287c6        app_mysql                 "docker-entrypoint..."   45 hours ago        Up 45 hours         3306/tcp, 33060/tcp                              app_mysql_1
+72464e9fd84a        redis                     "docker-entrypoint..."   3 days ago          Up 3 days           6379/tcp                                         app_redis_1
+09de40c95e73        redis                     "docker-entrypoint..."   3 days ago          Up 3 days           6379/tcp                                         dockerlumen_redis_1
+e6ed9ca402ff        predictionio/pio:latest   "sh /usr/bin/pio_run"    5 weeks ago         Up 3 days           0.0.0.0:7070->7070/tcp, 0.0.0.0:8000->8000/tcp   docker_pio_1
+b4cfbd3414b7        postgres:9                "docker-entrypoint..."   5 weeks ago         Up 3 days           5432/tcp                                         docker_postgres_1
+
+C:\Users\hp\docker-lumen>docker ps  -a
+CONTAINER ID        IMAGE                                  COMMAND                  CREATED             STATUS                        PORTS                                            NAMES
+585c14dc1321        app_nginx                              "nginx"                  45 hours ago        Up 45 hours                   0.0.0.0:443->443/tcp, 0.0.0.0:8080->80/tcp       app_nginx_1
+221dcfcd86f6        app_php-fpm                            "docker-php-entryp..."   45 hours ago        Up 45 hours                   9000/tcp                                         app_php-fpm_1
+224d1ec2cc7a        app_workspace                          "/sbin/init.sh"          45 hours ago        Exited (127) 36 minutes ago                                                    app_workspace_1
+5b11a29287c6        app_mysql                              "docker-entrypoint..."   45 hours ago        Up 45 hours                   3306/tcp, 33060/tcp                              app_mysql_1
+37b6b81bb176        app_application                        "true"                   45 hours ago        Exited (0) 36 minutes ago                                                      app_application_1
+72464e9fd84a        redis                                  "docker-entrypoint..."   3 days ago          Up 3 days                     6379/tcp                                         app_redis_1
+8b09cd02b2bf        aa0d0ac0a930                           "nginx"                  3 days ago          Created                                                                        8b09cd02b2bf_8b09cd02b2bf_8b09cd02b2bf_8b09cd02b2bf_dockerlumen_nginx_1
+09de40c95e73        redis                                  "docker-entrypoint..."   3 days ago          Up 3 days                     6379/tcp                                         dockerlumen_redis_1
+8c32084e62b1        p7hb/docker-spark                      "/bin/bash"              7 days ago          Exited (137) 3 days ago                                                        spark
+3a496d0a49bf        bde2020/spark-worker:2.4.0-hadoop2.7   "/bin/bash /worker.sh"   2 weeks ago         Created                       8081/tcp                                         spark-worker-1
+f2cebfb2158d        brunocf/spark-master                   "/home/spark/spark..."   3 weeks ago         Exited (143) 2 weeks ago                                                       master
+af67a95e284d        brunocf/spark-datastore                "/bin/sh -c /bin/true"   3 weeks ago         Created                                                                        spark-datastore
+21bf79c6382b        continuumio/anaconda3                  "/usr/bin/tini -- ..."   3 weeks ago         Exited (127) 3 weeks ago                                                       blissful_stonebraker
+9b9f1808b79a        java:8-jdk                             "/bin/bash"              3 weeks ago         Exited (255) 3 weeks ago                                                       loving_kilby
+85f951d14ba4        hello-world                            "/hello"                 3 weeks ago         Exited (0) 3 weeks ago                                                         goofy_cori
+67a6f7c41590        maven                                  "/usr/local/bin/mv..."   3 weeks ago         Exited (1) 3 weeks ago                                                         eager_wescoff
+99a1e3a4a834        hseeberger/scala-sbt                   "bash"                   3 weeks ago         Exited (127) 3 weeks ago                                                       jovial_turing
+e5cec8a648f6        actionml/spark                         "/entrypoint.sh wo..."   3 weeks ago         Exited (1) 3 weeks ago                                                         spark-worker1
+488fd3c31a4f        actionml/spark                         "/entrypoint.sh wo..."   3 weeks ago         Exited (1) 3 weeks ago                                                         spark-worker0
+40ceab87e84a        actionml/spark                         "/entrypoint.sh ma..."   3 weeks ago         Exited (127) 3 weeks ago                                                       spark-master
+8bee23fbe87d        predictionio/pio:latest                "/usr/bin/pio_run"       4 weeks ago         Created                       7070/tcp, 8000/tcp                               container11
+e7f12603633b        fc1f2fa4cedd                           "sh /usr/bin/pio_run"    4 weeks ago         Exited (1) 4 weeks ago                                                         peaceful_nightingale
+1bcf3f98fa7b        predictionio/pio:latest                "sh /usr/bin/pio_run"    4 weeks ago         Exited (1) 4 weeks ago                                                         loving_jang
+0793c4441416        predictionio/pio:latest                "docker_pio_1"           4 weeks ago         Created                       7070/tcp, 8000/tcp                               fervent_golick
+10d54ad950d7        predictionio/pio                       "sh /usr/bin/pio_run"    4 weeks ago         Exited (1) 4 weeks ago                                                         dreamy_pasteur
+60bee58fd342        alpine                                 "/bin/sh"                4 weeks ago         Exited (137) 4 weeks ago                                                       wizardly_hamilton
+27e2eaf2d0ba        alpine                                 "/bin/sh"                4 weeks ago         Exited (137) 4 weeks ago                                                       stupefied_haibt
+81eaaca64e71        alpine                                 "/bin/sh"                4 weeks ago         Exited (0) 4 weeks ago                                                         confident_curran
+6f86fcf6b236        alpine                                 "/bin/sh"                4 weeks ago         Exited (0) 4 weeks ago                                                         dazzling_roentgen
+0acdb92e4c20        alpine                                 "ls -l"                  4 weeks ago         Exited (0) 4 weeks ago                                                         epic_ramanujan
+461f6fc5553c        ubuntu                                 "/bin/bash"              4 weeks ago         Exited (0) 4 weeks ago                                                         clever_booth
+e6ed9ca402ff        predictionio/pio:latest                "sh /usr/bin/pio_run"    5 weeks ago         Up 3 days                     0.0.0.0:7070->7070/tcp, 0.0.0.0:8000->8000/tcp   docker_pio_1
+b4cfbd3414b7        postgres:9                             "docker-entrypoint..."   5 weeks ago         Up 3 days                     5432/tcp                                         docker_postgres_1
+
+C:\Users\hp\docker-lumen>docker ps
+CONTAINER ID        IMAGE                     COMMAND                  CREATED             STATUS              PORTS                                            NAMES
+585c14dc1321        app_nginx                 "nginx"                  45 hours ago        Up 45 hours         0.0.0.0:443->443/tcp, 0.0.0.0:8080->80/tcp       app_nginx_1
+221dcfcd86f6        app_php-fpm               "docker-php-entryp..."   45 hours ago        Up 45 hours         9000/tcp                                         app_php-fpm_1
+5b11a29287c6        app_mysql                 "docker-entrypoint..."   45 hours ago        Up 45 hours         3306/tcp, 33060/tcp                              app_mysql_1
+72464e9fd84a        redis                     "docker-entrypoint..."   3 days ago          Up 3 days           6379/tcp                                         app_redis_1
+09de40c95e73        redis                     "docker-entrypoint..."   3 days ago          Up 3 days           6379/tcp                                         dockerlumen_redis_1
+e6ed9ca402ff        predictionio/pio:latest   "sh /usr/bin/pio_run"    5 weeks ago         Up 3 days           0.0.0.0:7070->7070/tcp, 0.0.0.0:8000->8000/tcp   docker_pio_1
+b4cfbd3414b7        postgres:9                "docker-entrypoint..."   5 weeks ago         Up 3 days           5432/tcp                                         docker_postgres_1
+
+C:\Users\hp\docker-lumen>docker ps  -a
+CONTAINER ID        IMAGE                                  COMMAND                  CREATED             STATUS                        PORTS                                            NAMES
+585c14dc1321        app_nginx                              "nginx"                  45 hours ago        Up 45 hours                   0.0.0.0:443->443/tcp, 0.0.0.0:8080->80/tcp       app_nginx_1
+221dcfcd86f6        app_php-fpm                            "docker-php-entryp..."   45 hours ago        Up 45 hours                   9000/tcp                                         app_php-fpm_1
+224d1ec2cc7a        app_workspace                          "/sbin/init.sh"          45 hours ago        Exited (127) 37 minutes ago                                                    app_workspace_1
+5b11a29287c6        app_mysql                              "docker-entrypoint..."   45 hours ago        Up 45 hours                   3306/tcp, 33060/tcp                              app_mysql_1
+37b6b81bb176        app_application                        "true"                   45 hours ago        Exited (0) 37 minutes ago                                                      app_application_1
+72464e9fd84a        redis                                  "docker-entrypoint..."   3 days ago          Up 3 days                     6379/tcp                                         app_redis_1
+8b09cd02b2bf        aa0d0ac0a930                           "nginx"                  3 days ago          Created                                                                        8b09cd02b2bf_8b09cd02b2bf_8b09cd02b2bf_8b09cd02b2bf_dockerlumen_nginx_1
+09de40c95e73        redis                                  "docker-entrypoint..."   3 days ago          Up 3 days                     6379/tcp                                         dockerlumen_redis_1
+8c32084e62b1        p7hb/docker-spark                      "/bin/bash"              7 days ago          Exited (137) 3 days ago                                                        spark
+3a496d0a49bf        bde2020/spark-worker:2.4.0-hadoop2.7   "/bin/bash /worker.sh"   2 weeks ago         Created                       8081/tcp                                         spark-worker-1
+f2cebfb2158d        brunocf/spark-master                   "/home/spark/spark..."   3 weeks ago         Exited (143) 2 weeks ago                                                       master
+af67a95e284d        brunocf/spark-datastore                "/bin/sh -c /bin/true"   3 weeks ago         Created                                                                        spark-datastore
+21bf79c6382b        continuumio/anaconda3                  "/usr/bin/tini -- ..."   3 weeks ago         Exited (127) 3 weeks ago                                                       blissful_stonebraker
+9b9f1808b79a        java:8-jdk                             "/bin/bash"              3 weeks ago         Exited (255) 3 weeks ago                                                       loving_kilby
+85f951d14ba4        hello-world                            "/hello"                 3 weeks ago         Exited (0) 3 weeks ago                                                         goofy_cori
+67a6f7c41590        maven                                  "/usr/local/bin/mv..."   3 weeks ago         Exited (1) 3 weeks ago                                                         eager_wescoff
+99a1e3a4a834        hseeberger/scala-sbt                   "bash"                   3 weeks ago         Exited (127) 3 weeks ago                                                       jovial_turing
+e5cec8a648f6        actionml/spark                         "/entrypoint.sh wo..."   3 weeks ago         Exited (1) 3 weeks ago                                                         spark-worker1
+488fd3c31a4f        actionml/spark                         "/entrypoint.sh wo..."   3 weeks ago         Exited (1) 3 weeks ago                                                         spark-worker0
+40ceab87e84a        actionml/spark                         "/entrypoint.sh ma..."   3 weeks ago         Exited (127) 3 weeks ago                                                       spark-master
+8bee23fbe87d        predictionio/pio:latest                "/usr/bin/pio_run"       4 weeks ago         Created                       7070/tcp, 8000/tcp                               container11
+e7f12603633b        fc1f2fa4cedd                           "sh /usr/bin/pio_run"    4 weeks ago         Exited (1) 4 weeks ago                                                         peaceful_nightingale
+1bcf3f98fa7b        predictionio/pio:latest                "sh /usr/bin/pio_run"    4 weeks ago         Exited (1) 4 weeks ago                                                         loving_jang
+0793c4441416        predictionio/pio:latest                "docker_pio_1"           4 weeks ago         Created                       7070/tcp, 8000/tcp                               fervent_golick
+10d54ad950d7        predictionio/pio                       "sh /usr/bin/pio_run"    4 weeks ago         Exited (1) 4 weeks ago                                                         dreamy_pasteur
+60bee58fd342        alpine                                 "/bin/sh"                4 weeks ago         Exited (137) 4 weeks ago                                                       wizardly_hamilton
+27e2eaf2d0ba        alpine                                 "/bin/sh"                4 weeks ago         Exited (137) 4 weeks ago                                                       stupefied_haibt
+81eaaca64e71        alpine                                 "/bin/sh"                4 weeks ago         Exited (0) 4 weeks ago                                                         confident_curran
+6f86fcf6b236        alpine                                 "/bin/sh"                4 weeks ago         Exited (0) 4 weeks ago                                                         dazzling_roentgen
+0acdb92e4c20        alpine                                 "ls -l"                  4 weeks ago         Exited (0) 4 weeks ago                                                         epic_ramanujan
+461f6fc5553c        ubuntu                                 "/bin/bash"              4 weeks ago         Exited (0) 4 weeks ago                                                         clever_booth
+e6ed9ca402ff        predictionio/pio:latest                "sh /usr/bin/pio_run"    5 weeks ago         Up 3 days                     0.0.0.0:7070->7070/tcp, 0.0.0.0:8000->8000/tcp   docker_pio_1
+b4cfbd3414b7        postgres:9                             "docker-entrypoint..."   5 weeks ago         Up 3 days                     5432/tcp                                         docker_postgres_1
+
+C:\Users\hp\docker-lumen>docker inspect 224d1ec2cc7a
+[
+    {
+        "Id": "224d1ec2cc7a1a2e65bee7e0c55c097e1faf16aab831455e9726ab2d83b89472",
+        "Created": "2019-01-02T11:33:42.281599Z",
+        "Path": "/sbin/init.sh",
+        "Args": [],
+        "State": {
+            "Status": "exited",
+            "Running": false,
+            "Paused": false,
+            "Restarting": false,
+            "OOMKilled": false,
+            "Dead": false,
+            "Pid": 0,
+            "ExitCode": 127,
+            "Error": "",
+            "StartedAt": "2019-01-04T09:15:38.6026519Z",
+            "FinishedAt": "2019-01-04T09:15:38.7645705Z"
+        },
+        "Image": "sha256:1542fe455e428f16b97edfa84dad14f08ff4fd2e981626f69e54699c88df9c68",
+        "ResolvConfPath": "/var/lib/docker/containers/224d1ec2cc7a1a2e65bee7e0c55c097e1faf16aab831455e9726ab2d83b89472/resolv.conf",
+        "HostnamePath": "/var/lib/docker/containers/224d1ec2cc7a1a2e65bee7e0c55c097e1faf16aab831455e9726ab2d83b89472/hostname",
+        "HostsPath": "/var/lib/docker/containers/224d1ec2cc7a1a2e65bee7e0c55c097e1faf16aab831455e9726ab2d83b89472/hosts",
+        "LogPath": "/var/lib/docker/containers/224d1ec2cc7a1a2e65bee7e0c55c097e1faf16aab831455e9726ab2d83b89472/224d1ec2cc7a1a2e65bee7e0c55c097e1faf16aab831455e9726ab2d83b89472-json.log",
+        "Name": "/app_workspace_1",
+        "RestartCount": 0,
+        "Driver": "overlay2",
+        "MountLabel": "",
+        "ProcessLabel": "",
+        "AppArmorProfile": "",
+        "ExecIDs": null,
+        "HostConfig": {
+            "Binds": [
+                "/C/Users/hp/docker-lumen/src:/var/www:rw"
+            ],
+            "ContainerIDFile": "",
+            "LogConfig": {
+                "Type": "json-file",
+                "Config": {}
+            },
+            "NetworkMode": "app_default",
+            "PortBindings": {},
+            "RestartPolicy": {
+                "Name": "",
+                "MaximumRetryCount": 0
+            },
+            "AutoRemove": false,
+            "VolumeDriver": "",
+            "VolumesFrom": [],
+            "CapAdd": null,
+            "CapDrop": null,
+            "Dns": null,
+            "DnsOptions": null,
+            "DnsSearch": null,
+            "ExtraHosts": null,
+            "GroupAdd": null,
+            "IpcMode": "",
+            "Cgroup": "",
+            "Links": null,
+            "OomScoreAdj": 0,
+            "PidMode": "",
+            "Privileged": false,
+            "PublishAllPorts": false,
+            "ReadonlyRootfs": false,
+            "SecurityOpt": null,
+            "UTSMode": "",
+            "UsernsMode": "",
+            "ShmSize": 67108864,
+            "Runtime": "runc",
+            "ConsoleSize": [
+                0,
+                0
+            ],
+            "Isolation": "",
+            "CpuShares": 0,
+            "Memory": 0,
+            "NanoCpus": 0,
+            "CgroupParent": "",
+            "BlkioWeight": 0,
+            "BlkioWeightDevice": null,
+            "BlkioDeviceReadBps": null,
+            "BlkioDeviceWriteBps": null,
+            "BlkioDeviceReadIOps": null,
+            "BlkioDeviceWriteIOps": null,
+            "CpuPeriod": 0,
+            "CpuQuota": 0,
+            "CpuRealtimePeriod": 0,
+            "CpuRealtimeRuntime": 0,
+            "CpusetCpus": "",
+            "CpusetMems": "",
+            "Devices": null,
+            "DiskQuota": 0,
+            "KernelMemory": 0,
+            "MemoryReservation": 0,
+            "MemorySwap": 0,
+            "MemorySwappiness": -1,
+            "OomKillDisable": false,
+            "PidsLimit": 0,
+            "Ulimits": null,
+            "CpuCount": 0,
+            "CpuPercent": 0,
+            "IOMaximumIOps": 0,
+            "IOMaximumBandwidth": 0
+        },
+        "GraphDriver": {
+            "Name": "overlay2",
+            "Data": {
+                "LowerDir": "/var/lib/docker/overlay2/a8273d0cde6f896d907039c8dc7d34e926658df36d0b654274515f360369c48c-init/diff:/var/lib/docker/overlay2/3b3d8918ad127ab6f108044d644b17a4875ce6763cf01fcd6fb2c65a52adea6a/diff:/var/lib/docker/overlay2/41df40e5dce28a3c730563c2dcb8a6956911bc92b4904a111ab950b1cc4c32bb/diff:/var/lib/docker/overlay2/96ca49536028d25dc275b073eed59a63ede3c81ce7bde08ed4b116ec6bf33f3c/diff:/var/lib/docker/overlay2/8bd916e7097a81ebcac8305005c2fc8b5ffee2f98af81b2221e0ca70097c7247/diff:/var/lib/docker/overlay2/8c2f4bf43a052e77ece7b5a1f5f0268190cc5466d424cf1858f139e56af5d634/diff:/var/lib/docker/overlay2/ca707d6ae20c60ec682815f4de55bb2aef86b876c8bd7f872f8e2363cc641c27/diff:/var/lib/docker/overlay2/58b0ea0d5e986d2d12e51e17b56b2db8d1023b8cdb87693a7b301f701237c91b/diff:/var/lib/docker/overlay2/1283ef8f3652dcc9f906bea11ef8d22d1b49ede31c67f0dea581a11428f9ef4e/diff:/var/lib/docker/overlay2/d754f9ad0020f0085d7d6aa1931563e109d66a5fafcb52d97ba9a3a92737c950/diff:/var/lib/docker/overlay2/208330ad03033d881e8c423a4c36b8e83af3536136454d5b5e9b0d6ccdadcaa5/diff:/var/lib/docker/overlay2/f4b32fc833ac72d8b80052467ad8c3ef1537a089946fd02c3ec312d97fb412b0/diff:/var/lib/docker/overlay2/943cacc8a27c57a6902835be6c7341d2b985d19dbe63f4c41e7c4205a1271536/diff:/var/lib/docker/overlay2/5e90f0e6b13f6136b3c7ad155c2807f1dc5302f833891757d2fbd9d62b291e97/diff:/var/lib/docker/overlay2/a498828aa5c2e84f41a2df834d82c584c9b0c7c3a772775d3cf97b5302bc7392/diff:/var/lib/docker/overlay2/d2a3c592161473ef1d9df927f1bb0933d81cdffd64220ef3ed04af0caa69392d/diff:/var/lib/docker/overlay2/97e69b4c154f13e5a9704203077ae69e777f06a4aa95445231bb0d4b28749dca/diff:/var/lib/docker/overlay2/1b540d7ccd6cccdae2d4ded85b0d4e5e13ee929923bc1c79f5a86e7386f816aa/diff:/var/lib/docker/overlay2/1f28044ac11997027103b0d9d3d07ad1a3dd6a2ac670d04226ac0528341a1fd0/diff:/var/lib/docker/overlay2/394b7adc1f1a5514a97ecbd7854caecf06110106c980cd84d32eab33ea4fcd4a/diff:/var/lib/docker/overlay2/72e9b581247fbe769123219a88a4c166d72363c62fa0c407563db5e5952ed987/diff:/var/lib/docker/overlay2/edf20656095ce78922c50c13572461a97cdea8bffbb4a419fb6c42dde41fb289/diff",
+                "MergedDir": "/var/lib/docker/overlay2/a8273d0cde6f896d907039c8dc7d34e926658df36d0b654274515f360369c48c/merged",
+                "UpperDir": "/var/lib/docker/overlay2/a8273d0cde6f896d907039c8dc7d34e926658df36d0b654274515f360369c48c/diff",
+                "WorkDir": "/var/lib/docker/overlay2/a8273d0cde6f896d907039c8dc7d34e926658df36d0b654274515f360369c48c/work"
+            }
+        },
+        "Mounts": [
+            {
+                "Type": "bind",
+                "Source": "/C/Users/hp/docker-lumen/src",
+                "Destination": "/var/www",
+                "Mode": "rw",
+                "RW": true,
+                "Propagation": ""
+            }
+        ],
+        "Config": {
+            "Hostname": "224d1ec2cc7a",
+            "Domainname": "",
+            "User": "",
+            "AttachStdin": false,
+            "AttachStdout": false,
+            "AttachStderr": false,
+            "Tty": true,
+            "OpenStdin": false,
+            "StdinOnce": false,
+            "Env": [
+                "PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin",
+                "DEBIAN_FRONTEND=teletype",
+                "LANG=en_US.UTF-8",
+                "LANGUAGE=en_US.UTF-8",
+                "LC_ALL=en_US.UTF-8",
+                "LC_CTYPE=UTF-8",
+                "TERM=xterm",
+                "COMPOSER_ALLOW_SUPERUSER=1"
+            ],
+            "Cmd": [
+                "/sbin/init.sh"
+            ],
+            "ArgsEscaped": true,
+            "Image": "app_workspace",
+            "Volumes": {
+                "/var/www": {}
+            },
+            "WorkingDir": "/var/www",
+            "Entrypoint": null,
+            "OnBuild": null,
+            "Labels": {
+                "com.docker.compose.config-hash": "1e5c423d279b3c7c0e132784628478d01da5569db4da8014e904c533e4d843da",
+                "com.docker.compose.container-number": "1",
+                "com.docker.compose.oneoff": "False",
+                "com.docker.compose.project": "app",
+                "com.docker.compose.service": "workspace",
+                "com.docker.compose.version": "1.11.2"
+            }
+        },
+        "NetworkSettings": {
+            "Bridge": "",
+            "SandboxID": "d82f95dc2e669a93730bae96fbb5e7361bd40a5c11c866201307ed0d458cabc5",
+            "HairpinMode": false,
+            "LinkLocalIPv6Address": "",
+            "LinkLocalIPv6PrefixLen": 0,
+            "Ports": null,
+            "SandboxKey": "/var/run/docker/netns/d82f95dc2e66",
+            "SecondaryIPAddresses": null,
+            "SecondaryIPv6Addresses": null,
+            "EndpointID": "",
+            "Gateway": "",
+            "GlobalIPv6Address": "",
+            "GlobalIPv6PrefixLen": 0,
+            "IPAddress": "",
+            "IPPrefixLen": 0,
+            "IPv6Gateway": "",
+            "MacAddress": "",
+            "Networks": {
+                "app_default": {
+                    "IPAMConfig": null,
+                    "Links": [
+                        "app_mysql_1:app_mysql_1",
+                        "app_mysql_1:mysql",
+                        "app_mysql_1:mysql_1",
+                        "app_redis_1:app_redis_1",
+                        "app_redis_1:redis",
+                        "app_redis_1:redis_1"
+                    ],
+                    "Aliases": [
+                        "224d1ec2cc7a",
+                        "workspace"
+                    ],
+                    "NetworkID": "b58e5a9da0b856ee2765169652decc546f70be464b584319ec037bd75a20473c",
+                    "EndpointID": "",
+                    "Gateway": "",
+                    "IPAddress": "",
+                    "IPPrefixLen": 0,
+                    "IPv6Gateway": "",
+                    "GlobalIPv6Address": "",
+                    "GlobalIPv6PrefixLen": 0,
+                    "MacAddress": ""
+                }
+            }
+        }
+    }
+]
+
+C:\Users\hp\docker-lumen>
+C:\Users\hp\docker-lumen>notepad /var/lib/docker/containers/224d1ec2cc7a1a2e65bee7e0c55c097e1faf16aab831455e9726ab2d83b89472/224d1ec2cc7a1a2e65bee7e0c55c097e1faf16aab831455e9726ab2d83b89472-json.log\
+
+
+C:\Users\hp\docker-lumen>docker ps
+CONTAINER ID        IMAGE                     COMMAND                  CREATED             STATUS              PORTS                                            NAMES
+ad711b5f5717        ubuntu:16.04              "bash"                   35 minutes ago      Up 35 minutes                                                        pedantic_dubinsky
+585c14dc1321        app_nginx                 "nginx"                  46 hours ago        Up 46 hours         0.0.0.0:443->443/tcp, 0.0.0.0:8080->80/tcp       app_nginx_1
+221dcfcd86f6        app_php-fpm               "docker-php-entryp..."   47 hours ago        Up 47 hours         9000/tcp                                         app_php-fpm_1
+5b11a29287c6        app_mysql                 "docker-entrypoint..."   47 hours ago        Up 47 hours         3306/tcp, 33060/tcp                              app_mysql_1
+72464e9fd84a        redis                     "docker-entrypoint..."   3 days ago          Up 3 days           6379/tcp                                         app_redis_1
+09de40c95e73        redis                     "docker-entrypoint..."   3 days ago          Up 3 days           6379/tcp                                         dockerlumen_redis_1
+e6ed9ca402ff        predictionio/pio:latest   "sh /usr/bin/pio_run"    5 weeks ago         Up 3 days           0.0.0.0:7070->7070/tcp, 0.0.0.0:8000->8000/tcp   docker_pio_1
+b4cfbd3414b7        postgres:9                "docker-entrypoint..."   5 weeks ago         Up 3 days           5432/tcp                                         docker_postgres_1
+
+C:\Users\hp\docker-lumen> docker ps -f "status=exited"
+CONTAINER ID        IMAGE                     COMMAND                  CREATED             STATUS                        PORTS               NAMES
+224d1ec2cc7a        app_workspace             "/sbin/init.sh"          47 hours ago        Exited (127) 44 seconds ago                       app_workspace_1
+37b6b81bb176        app_application           "true"                   47 hours ago        Exited (0) 2 hours ago                            app_application_1
+8c32084e62b1        p7hb/docker-spark         "/bin/bash"              7 days ago          Exited (137) 3 days ago                           spark
+f2cebfb2158d        brunocf/spark-master      "/home/spark/spark..."   3 weeks ago         Exited (143) 2 weeks ago                          master
+21bf79c6382b        continuumio/anaconda3     "/usr/bin/tini -- ..."   3 weeks ago         Exited (127) 3 weeks ago                          blissful_stonebraker
+9b9f1808b79a        java:8-jdk                "/bin/bash"              3 weeks ago         Exited (255) 3 weeks ago                          loving_kilby
+85f951d14ba4        hello-world               "/hello"                 3 weeks ago         Exited (0) 3 weeks ago                            goofy_cori
+67a6f7c41590        maven                     "/usr/local/bin/mv..."   3 weeks ago         Exited (1) 3 weeks ago                            eager_wescoff
+99a1e3a4a834        hseeberger/scala-sbt      "bash"                   3 weeks ago         Exited (127) 3 weeks ago                          jovial_turing
+e5cec8a648f6        actionml/spark            "/entrypoint.sh wo..."   3 weeks ago         Exited (1) 3 weeks ago                            spark-worker1
+488fd3c31a4f        actionml/spark            "/entrypoint.sh wo..."   3 weeks ago         Exited (1) 3 weeks ago                            spark-worker0
+40ceab87e84a        actionml/spark            "/entrypoint.sh ma..."   3 weeks ago         Exited (127) 3 weeks ago                          spark-master
+e7f12603633b        fc1f2fa4cedd              "sh /usr/bin/pio_run"    4 weeks ago         Exited (1) 4 weeks ago                            peaceful_nightingale
+1bcf3f98fa7b        predictionio/pio:latest   "sh /usr/bin/pio_run"    4 weeks ago         Exited (1) 4 weeks ago                            loving_jang
+10d54ad950d7        predictionio/pio          "sh /usr/bin/pio_run"    4 weeks ago         Exited (1) 4 weeks ago                            dreamy_pasteur
+60bee58fd342        alpine                    "/bin/sh"                4 weeks ago         Exited (137) 4 weeks ago                          wizardly_hamilton
+27e2eaf2d0ba        alpine                    "/bin/sh"                4 weeks ago         Exited (137) 4 weeks ago                          stupefied_haibt
+81eaaca64e71        alpine                    "/bin/sh"                4 weeks ago         Exited (0) 4 weeks ago                            confident_curran
+6f86fcf6b236        alpine                    "/bin/sh"                4 weeks ago         Exited (0) 4 weeks ago                            dazzling_roentgen
+0acdb92e4c20        alpine                    "ls -l"                  4 weeks ago         Exited (0) 4 weeks ago                            epic_ramanujan
+461f6fc5553c        ubuntu                    "/bin/bash"              4 weeks ago         Exited (0) 4 weeks ago                            clever_booth
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
